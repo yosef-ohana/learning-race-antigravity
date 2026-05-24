@@ -1,5 +1,7 @@
 package com.innovativelearning.entities;
 
+import com.innovativelearning.enums.ParticipantState;
+
 public class RaceParticipantEntity {
     private Long id;
     private Long raceId;
@@ -23,6 +25,10 @@ public class RaceParticipantEntity {
     private Integer wrongStreakAtLevel;
     private Long speedMultiplierUntil;
     private Long lastDecisionMeterUpdate;
+    
+    private ParticipantState currentState;
+    private Double activeLuckMultiplier;
+    private Integer questionsAnsweredInCurrentState;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -67,4 +73,11 @@ public class RaceParticipantEntity {
     public void setSpeedMultiplierUntil(Long speedMultiplierUntil) { this.speedMultiplierUntil = speedMultiplierUntil; }
     public Long getLastDecisionMeterUpdate() { return lastDecisionMeterUpdate; }
     public void setLastDecisionMeterUpdate(Long lastDecisionMeterUpdate) { this.lastDecisionMeterUpdate = lastDecisionMeterUpdate; }
+
+    public ParticipantState getCurrentState() { return currentState; }
+    public void setCurrentState(ParticipantState currentState) { this.currentState = currentState; }
+    public Double getActiveLuckMultiplier() { return activeLuckMultiplier; }
+    public void setActiveLuckMultiplier(Double activeLuckMultiplier) { this.activeLuckMultiplier = activeLuckMultiplier; }
+    public Integer getQuestionsAnsweredInCurrentState() { return questionsAnsweredInCurrentState; }
+    public void setQuestionsAnsweredInCurrentState(Integer questionsAnsweredInCurrentState) { this.questionsAnsweredInCurrentState = questionsAnsweredInCurrentState; }
 }

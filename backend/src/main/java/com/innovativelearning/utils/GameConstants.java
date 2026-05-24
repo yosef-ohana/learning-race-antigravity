@@ -36,4 +36,16 @@ public class GameConstants {
     public static final int BOOST_DURATION_SECONDS = 2;
     
     public static final int BEHIND_RANK_THRESHOLD = 3;
+
+    // Added Batch A Constants
+    public static final double TRACK_TOTAL_SCORE = 1000.0;
+    public static final double SCORE_NORMAL_FRACTION = 20.0;
+    public static final double SCORE_DIRT_FRACTION = 45.0;
+    public static final double SCORE_HIGHWAY_FRACTION = 8.0;
+    public static final int HIGHWAY_QUESTION_COUNT = 2;
+    public static final int DIRT_QUESTION_COUNT = 3;
+    public static final int LUCK_TRIGGER_QUESTIONS = 3;
+    public static final int LUCK_TRIGGER_SECONDS = 180;
+    public static final double LUCK_BOOST_MULTIPLIER = 1.5;
+    public static final double LUCK_PUNCTURE_MULTIPLIER = 0.5;
 }

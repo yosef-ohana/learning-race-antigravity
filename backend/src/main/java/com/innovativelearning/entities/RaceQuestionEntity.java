@@ -15,6 +15,11 @@ public class RaceQuestionEntity {
     private Boolean isAnswered;
     private Boolean wasCorrect;
     private String helpUsed;
+    
+    private String optionsJson;
+    private Integer correctOptionId;
+    private String fingerprint;
+    private String status;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -44,4 +49,13 @@ public class RaceQuestionEntity {
     public void setWasCorrect(Boolean wasCorrect) { this.wasCorrect = wasCorrect; }
     public String getHelpUsed() { return helpUsed; }
     public void setHelpUsed(String helpUsed) { this.helpUsed = helpUsed; }
+
+    public String getOptionsJson() { return optionsJson; }
+    public void setOptionsJson(String optionsJson) { this.optionsJson = optionsJson; }
+    public Integer getCorrectOptionId() { return correctOptionId; }
+    public void setCorrectOptionId(Integer correctOptionId) { this.correctOptionId = correctOptionId; }
+    public String getFingerprint() { return fingerprint; }
+    public void setFingerprint(String fingerprint) { this.fingerprint = fingerprint; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
