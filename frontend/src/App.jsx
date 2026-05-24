@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom'
+import { ROUTES } from './config/routePaths'
 import HomePage from './pages/HomePage'
 import TeacherLoginPage from './pages/TeacherLoginPage'
 import TeacherCreateRacePage from './pages/TeacherCreateRacePage'
@@ -14,13 +15,13 @@ function App() {
   return (
     <div className="app-container">
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/teacher/login" element={<TeacherLoginPage />} />
-        <Route path="/teacher/create-race" element={<TeacherCreateRacePage />} />
+        <Route path={ROUTES.HOME} element={<HomePage />} />
+        <Route path={ROUTES.TEACHER_LOGIN} element={<TeacherLoginPage />} />
+        <Route path={ROUTES.TEACHER_CREATE_RACE} element={<TeacherCreateRacePage />} />
         <Route path="/teacher/race/:raceCode/lobby" element={<TeacherLobbyPage />} />
         <Route path="/teacher/race/:raceId/live" element={<TeacherRaceDashboardPage />} />
         <Route path="/teacher/race/:raceId/results" element={<TeacherResultsPage />} />
-        <Route path="/student/join" element={<StudentJoinPage />} />
+        <Route path={ROUTES.STUDENT_JOIN} element={<StudentJoinPage />} />
         <Route path="/student/race/:raceCode/lobby" element={<StudentLobbyPage />} />
         <Route path="/student/race/:raceId/play" element={<StudentRacePage />} />
         <Route path="/student/race/:raceId/results" element={<StudentResultsPage />} />

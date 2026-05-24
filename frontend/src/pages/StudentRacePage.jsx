@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import Layout from '../components/Layout';
-import QuestionCard from '../components/QuestionCard';
-import EventBanner from '../components/EventBanner';
 import RaceTrack from '../components/RaceTrack';
 import PathChoiceModal from '../components/PathChoiceModal';
+import QuestionCard from '../components/QuestionCard';
 import HelpChoiceModal from '../components/HelpChoiceModal';
 import axios from 'axios';
 import Cookies from 'js-cookie';
-import { COOKIE_STUDENT_TOKEN, COOKIE_RACE_ID } from '../config/cookieNames';
+import { COOKIE_STUDENT_TOKEN } from '../config/cookieNames';
 import { API_BASE } from '../config/Constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
+import { createSSEConnection } from '../services/sse';
 
 const StudentRacePage = () => {
   const { raceId } = useParams();
   const [state, setState] = useState(null);
   const [question, setQuestion] = useState(null);
   const [event, setEvent] = useState(null);
-  const [showHelp, setShowHelp] = useState(false);
+  const [sseError, setSseError] = useState(false);
+  const [isAnswering, setIsAnswering] = useState(false);
+  const [frozenTimeRemaining, setFrozenTimeRemaining] = useState(0);
   const navigate = useNavigate();
 
   const token = Cookies.get(COOKIE_STUDENT_TOKEN);
@@ -33,18 +34,15 @@ const StudentRacePage = () => {
         return;
       }
 
-      if (newState.canPlay && !newState.playerState.hasPendingDecision) {
+      if (newState.canPlay && !newState.playerState.hasPendingDecision && !newState.playerState.hasPendingHelpChoice && newState.playerState.status !== 'FROZEN') {
         const qRes = await axios.get(`${API_BASE}/get-current-question`, { params: { token, raceId } });
         if (qRes.data) {
           setQuestion(qRes.data);
-          // Show help modal if behind and we haven't shown it yet for this question context
-          if (newState.playerState.hasPendingHelpChoice && !qRes.data.helpUsed && !showHelp) {
-            setShowHelp(true);
-          }
         } else {
-          // No question available (maybe frozen or max decision meter)
           setQuestion(null);
         }
+      } else {
+        setQuestion(null);
       }
     } catch (e) {
       console.error(e);
@@ -54,42 +52,50 @@ const StudentRacePage = () => {
   useEffect(() => {
     if (!token) return navigate(ROUTES.STUDENT_JOIN);
     
-    fetchStateAndQuestion();
-    const interval = setInterval(fetchStateAndQuestion, 2000);
-    return () => clearInterval(interval);
+    let isMounted = true;
+    
+    const evtSource = createSSEConnection('/subscribe-student-race', { token, raceId }, {
+      onOpen: () => {
+        if (isMounted) {
+          setSseError(false);
+          fetchStateAndQuestion();
+        }
+      },
+      onError: () => {
+        if (isMounted) {
+          setSseError(true);
+        }
+      },
+      events: {
+        'state-update': () => {
+          if (isMounted) fetchStateAndQuestion();
+        },
+        'race-finished': () => {
+          if (isMounted) navigate(ROUTES.STUDENT_RESULTS(raceId));
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      evtSource.close();
+    };
   }, [raceId, navigate, token]);
 
-  const handleSubmitAnswer = async (answer) => {
-    try {
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      formData.append('questionId', question.questionId);
-      formData.append('answer', answer);
-
-      const res = await axios.post(`${API_BASE}/submit-answer`, formData);
-      if (res.data.success) {
-        if (res.data.isCorrect) {
-          setEvent(`Correct! +${res.data.progressDelta}m`);
-          if (res.data.luckEvent) {
-            setTimeout(() => setEvent(`Luck Event: ${res.data.luckEvent}!`), 1500);
-          }
-        } else {
-          setEvent('Incorrect!');
-        }
-        setQuestion(null);
-        setShowHelp(false);
-        fetchStateAndQuestion();
-      }
-    } catch (e) {
-      console.error(e);
+  useEffect(() => {
+    let interval = null;
+    if (state?.playerState?.status === 'FROZEN' && state?.playerState?.frozenExpiresAt) {
+      const calculateRemaining = () => {
+        const remaining = Math.max(0, Math.ceil((new Date(state.playerState.frozenExpiresAt).getTime() - Date.now()) / 1000));
+        setFrozenTimeRemaining(remaining);
+      };
+      calculateRemaining();
+      interval = setInterval(calculateRemaining, 1000);
     }
-  };
-
-  const handleExpire = async () => {
-    // Treat as incorrect/expired
-    handleSubmitAnswer('');
-  };
+    return () => {
+      if (interval) clearInterval(interval);
+    };
+  }, [state]);
 
   const handlePathChoice = async (choice) => {
     try {
@@ -110,66 +116,113 @@ const StudentRacePage = () => {
       formData.append('token', token);
       formData.append('raceId', raceId);
       formData.append('helpType', choice);
-      const res = await axios.post(`${API_BASE}/use-help`, formData);
-      setShowHelp(false);
-      if (res.data) {
-        setQuestion(res.data);
-      } else {
-        // replaced, fetch new
-        fetchStateAndQuestion();
-      }
+      await axios.post(`${API_BASE}/use-help`, formData);
+      fetchStateAndQuestion();
     } catch (e) {
       console.error(e);
     }
   };
 
-  if (!state || !state.playerState) return <Layout>Loading...</Layout>;
+  const handleSkipHelp = async () => {
+    try {
+      const formData = new URLSearchParams();
+      formData.append('token', token);
+      formData.append('raceId', raceId);
+      await axios.post(`${API_BASE}/skip-help`, formData);
+      fetchStateAndQuestion();
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleSubmitAnswer = async (answer) => {
+    setIsAnswering(true);
+    try {
+      const formData = new URLSearchParams();
+      formData.append('token', token);
+      formData.append('raceId', raceId);
+      formData.append('questionId', question?.questionId || '');
+      formData.append('answer', answer || '');
+
+      const res = await axios.post(`${API_BASE}/submit-answer`, formData);
+      if (res.data.success) {
+        setEvent(res.data.isCorrect ? 'CORRECT MATCH' : 'SYSTEM ERROR: INCORRECT');
+        setQuestion(null);
+        fetchStateAndQuestion();
+        setTimeout(() => setEvent(null), 2000);
+      }
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsAnswering(false);
+    }
+  };
+
+  if (!state || !state.playerState) return <div className="student-layout" style={{ justifyContent: 'center', alignItems: 'center', fontSize: '2rem' }}>INITIALIZING...</div>;
 
   return (
-    <Layout>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', backgroundColor: '#f0f4f8', padding: '1rem', borderRadius: '8px' }}>
-        <div><strong>Your Position:</strong> {state.playerState.position}m</div>
-        <div><strong>Your Points:</strong> {state.playerState.points}</div>
-      </div>
-      
-      <RaceTrack participantsPositions={state.participantsPositions} currentUserId={state.playerState.id} />
-      <div style={{ margin: '1rem 0' }}></div>
-      
-      <div className="decision-meter">
-        <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter}%` }}></div>
-      </div>
-      <div style={{ textAlign: 'center', marginBottom: '2rem', fontSize: '0.8rem' }}>Decision Meter</div>
-
-      <EventBanner event={event} />
-
-      {state.playerState.hasPendingDecision ? (
-        <div>Waiting for your decision...</div>
-      ) : question ? (
-        <QuestionCard question={question} onSubmitAnswer={handleSubmitAnswer} onExpire={handleExpire} />
-      ) : (
-        <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-          <h3>Waiting...</h3>
-          <p>You might be frozen from a penalty or luck event.</p>
+    <div className="student-layout">
+      {sseError && (
+        <div className="overlay-blur" style={{ zIndex: 9999, color: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: 'inset 0 0 50px rgba(255,0,0,0.2)' }}>
+          <h2 style={{ fontSize: '3rem' }}>NETWORK DISCONNECTED</h2>
+          <p>ATTEMPTING RECONNECTION...</p>
         </div>
       )}
 
-      <PathChoiceModal 
-        isOpen={state.playerState.hasPendingDecision} 
-        onChoice={handlePathChoice} 
-      />
+      <div className="student-top">
+        <div style={{ display: 'flex', justifyItems: 'space-between', gap: '2rem', marginBottom: '1rem' }}>
+          <div className="glow-card" style={{ flex: 1 }}>POS: {state.playerState.position}m</div>
+          <div className="glow-card-green" style={{ flex: 1 }}>PTS: {state.playerState.points}</div>
+        </div>
+        
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+          <RaceTrack participantsPositions={state.participantsPositions} currentUserId={state.playerState.id} />
+          
+          <div className="decision-meter" style={{ marginTop: '1rem', width: '100%', height: '10px' }}>
+            <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter || 0}%`, height: '100%' }}></div>
+          </div>
+        </div>
+      </div>
 
-      <HelpChoiceModal 
-        isOpen={showHelp} 
-        onChoice={handleHelpChoice} 
-        onSkip={() => {
-            setShowHelp(false);
-            const formData = new URLSearchParams();
-            formData.append('token', token);
-            formData.append('raceId', raceId);
-            axios.post(`${API_BASE}/skip-help`, formData).then(() => fetchStateAndQuestion());
-        }} 
-      />
-    </Layout>
+      <div className="student-bottom">
+        {state.playerState.status === 'FROZEN' && (
+          <div className="overlay-blur">
+            <h1 style={{ fontSize: '4rem', margin: 0 }}>🧊 FROZEN 🧊</h1>
+            <h2 style={{ fontSize: '2rem', marginTop: '1rem' }}>SYSTEM LOCKED: {frozenTimeRemaining}s</h2>
+          </div>
+        )}
+
+        {event && (
+          <div className="overlay-blur" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 90 }}>
+            <h1 style={{ fontSize: '3rem', color: event.includes('CORRECT') ? 'var(--neon-green)' : 'var(--danger)' }}>{event}</h1>
+          </div>
+        )}
+
+        {state.playerState.hasPendingDecision ? (
+          <PathChoiceModal isOpen={true} onChoice={handlePathChoice} />
+        ) : state.playerState.hasPendingHelpChoice ? (
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <HelpChoiceModal isOpen={true} onChoice={handleHelpChoice} onSkip={handleSkipHelp} />
+          </div>
+        ) : question ? (
+          isAnswering ? (
+            <div className="overlay-blur">
+              <h2 style={{ fontSize: '2rem' }}>UPLOADING ANSWER...</h2>
+            </div>
+          ) : (
+            <QuestionCard 
+              question={question} 
+              onSubmitAnswer={handleSubmitAnswer} 
+              onExpire={() => handleSubmitAnswer('')} 
+            />
+          )
+        ) : (
+          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)' }}>
+            AWAITING NEXT PHASE...
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import Leaderboard from '../components/Leaderboard';
 import Button from '../components/Button';
 import axios from 'axios';
@@ -20,26 +19,30 @@ const TeacherResultsPage = () => {
     if (!token) return navigate(ROUTES.TEACHER_LOGIN);
 
     axios.get(`${API_BASE}/get-race-results`, { params: { token, raceId } })
-      .then(res => setResults(res.data));
+      .then(res => setResults(res.data))
+      .catch(err => console.error(err));
   }, [raceId, navigate]);
 
   if (!results) return <Layout>Loading results...</Layout>;
 
   return (
     <Layout>
-      <Card style={{ textAlign: 'center' }}>
-        <h1 style={{color: 'var(--primary)', fontSize: '3rem'}}>Race Finished!</h1>
+      <div>
+        <h1>Race Finished!</h1>
         {results.winner && (
           <h2>Winner: {results.winner.displayName} 🏆</h2>
         )}
         <p>{results.summaryStats}</p>
-        <div style={{marginTop: '2rem', textAlign: 'left'}}>
+        
+        <div style={{ marginTop: '2rem' }}>
+          <h3>Final Podium</h3>
           <Leaderboard leaderboard={results.leaderboard} />
         </div>
-        <div style={{marginTop: '2rem'}}>
+        
+        <div style={{ marginTop: '2rem' }}>
           <Button onClick={() => navigate(ROUTES.TEACHER_CREATE_RACE)}>Create Another Race</Button>
         </div>
-      </Card>
+      </div>
     </Layout>
   );
 };

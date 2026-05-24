@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import Layout from '../components/Layout';
-import Card from '../components/Card';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { COOKIE_STUDENT_TOKEN, COOKIE_RACE_ID } from '../config/cookieNames';
 import { API_BASE } from '../config/Constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
+import { createSSEConnection } from '../services/sse';
 
 const StudentLobbyPage = () => {
   const { raceCode } = useParams();
+  const [lobbyState, setLobbyState] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -20,31 +21,48 @@ const StudentLobbyPage = () => {
       return;
     }
 
+    let isMounted = true;
+
     const checkState = async () => {
       try {
         const res = await axios.get(`${API_BASE}/get-student-race-state`, { params: { token, raceId } });
-        if (res.data.raceStatus === 'LIVE') {
-          navigate(ROUTES.STUDENT_RACE(raceId));
-        } else if (res.data.raceStatus === 'FINISHED') {
-          navigate(ROUTES.STUDENT_RESULTS(raceId));
+        if (isMounted) {
+          setLobbyState(res.data);
+          if (res.data.raceStatus === 'LIVE' || res.data.raceStatus === 'ACTIVE') {
+            navigate(ROUTES.STUDENT_RACE(raceId));
+          } else if (res.data.raceStatus === 'FINISHED') {
+            navigate(ROUTES.STUDENT_RESULTS(raceId));
+          }
         }
       } catch (e) {
         console.error(e);
       }
     };
 
-    checkState();
-    const interval = setInterval(checkState, 2000); // Polling instead of SSE
-    return () => clearInterval(interval);
+    const evtSource = createSSEConnection('/subscribe-student-race', { token, raceId }, {
+      onOpen: () => {
+        if (isMounted) checkState();
+      },
+      events: {
+        'state-update': () => {
+          if (isMounted) checkState();
+        }
+      }
+    });
+
+    return () => {
+      isMounted = false;
+      evtSource.close();
+    };
   }, [navigate]);
 
   return (
     <Layout>
-      <Card style={{ textAlign: 'center', marginTop: '10vh' }}>
-        <h2>You're in!</h2>
-        <p>Room Code: <strong>{raceCode}</strong></p>
-        <p>Waiting for the teacher to start the race...</p>
-      </Card>
+      <div>
+        <p>Waiting for teacher to start the race...</p>
+        <p>Room Code: {raceCode}</p>
+        <p>{lobbyState ? (lobbyState.participantsCount || lobbyState.participantsPositions?.length || 0) : 0} joined</p>
+      </div>
     </Layout>
   );
 };
