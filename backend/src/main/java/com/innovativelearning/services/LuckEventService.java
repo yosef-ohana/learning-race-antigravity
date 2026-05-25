@@ -11,17 +11,24 @@ import java.util.Random;
 public class LuckEventService {
 
     private final Random random = new Random();
+    private final java.util.concurrent.ConcurrentHashMap<Long, Long> lastLuckTimes = new java.util.concurrent.ConcurrentHashMap<>();
 
-    public void evaluateLuckEvent(RaceParticipantEntity participant, int totalAnsweredQuestions, long lastLuckEventTimeSeconds, long currentTimeSeconds) {
+    public void evaluateLuckEvent(RaceParticipantEntity participant, int totalAnsweredQuestions, long currentTimeSeconds) {
         if (participant.getActiveLuckMultiplier() != null && participant.getActiveLuckMultiplier() != 1.0) {
             return;
         }
+
+        long lastLuckEventTimeSeconds = lastLuckTimes.getOrDefault(participant.getId(), currentTimeSeconds); // default to current time to start the 180s clock from the first check
 
         boolean eligibleByQuestions = (totalAnsweredQuestions > 0 && totalAnsweredQuestions % GameConstants.LUCK_TRIGGER_QUESTIONS == 0);
         boolean eligibleByTime = (currentTimeSeconds - lastLuckEventTimeSeconds >= GameConstants.LUCK_TRIGGER_SECONDS);
 
         if (eligibleByQuestions || eligibleByTime) {
             triggerLuckEvent(participant);
+            lastLuckTimes.put(participant.getId(), currentTimeSeconds);
+        } else if (!lastLuckTimes.containsKey(participant.getId())) {
+            // Initialize the clock for this participant if not already tracking
+            lastLuckTimes.put(participant.getId(), currentTimeSeconds);
         }
     }
 

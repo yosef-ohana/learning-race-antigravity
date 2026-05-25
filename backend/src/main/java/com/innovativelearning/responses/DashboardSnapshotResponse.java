@@ -18,5 +18,6 @@ public class DashboardSnapshotResponse {
         public Double activeLuckMultiplier;
         public int decisionMeter;
         public Long freezeUntil;
+        public boolean finished;
     }
 }

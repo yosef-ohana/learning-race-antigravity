@@ -119,12 +119,15 @@ public class GameplayController {
         res.playerState.isBehind = checkIsBehind(raceId, res.playerState.position);
         res.playerState.hasPendingDecision = participant.getCurrentState() == ParticipantState.DECISION_PENDING && !hasActiveQ;
         res.playerState.currentState = participant.getCurrentState() != null ? participant.getCurrentState().name() : ParticipantState.NORMAL.name();
+        res.playerState.status = res.playerState.currentState;
         res.playerState.activeLuckMultiplier = participant.getActiveLuckMultiplier();
         res.playerState.decisionMeter = participant.getDecisionMeter() != null ? participant.getDecisionMeter() : 0;
         res.playerState.freezeUntil = participant.getFreezeUntil();
         
         boolean helpAlreadyUsed = activeQ != null && activeQ.getHelpUsed() != null;
         res.playerState.hasPendingHelpChoice = isHelpEligibleNow(raceId, participant) && !res.playerState.hasPendingDecision && !helpAlreadyUsed;
+        res.playerState.helpAvailable = res.playerState.hasPendingHelpChoice;
+        res.playerState.raceFinished = Boolean.TRUE.equals(participant.getFinished());
 
         List<RaceParticipantEntity> allParts = persist.executeQuery("from RaceParticipantEntity where raceId = :rid", Map.of("rid", raceId), RaceParticipantEntity.class);
         com.innovativelearning.utils.RaceUtils.sortParticipants(allParts);
@@ -177,7 +180,7 @@ public class GameplayController {
                     // Expire old
                     q.setIsAnswered(true);
                     q.setWasCorrect(false);
-                    q.setStatus("EXPIRED");
+                    q.setStatus("TIMEOUT");
                     persist.update(q);
                     branchingService.handleQuestionAnswered(participant, false, now);
                     persist.update(participant);
@@ -187,7 +190,7 @@ public class GameplayController {
         }
         
         if (activeQ == null) {
-            QuestionTemplateEntity tmpl = pickTemplate(participant);
+            QuestionTemplateEntity tmpl = pickTemplate(participant, existingQs);
             activeQ = questionGeneratorService.generateQuestion(raceId, participant.getId(), tmpl, existingQs);
             persist.save(activeQ);
         }
@@ -195,7 +198,7 @@ public class GameplayController {
         QuestionResponse qr = new QuestionResponse();
         qr.questionId = activeQ.getId();
         qr.questionText = activeQ.getQuestionText();
-        qr.optionsJson = activeQ.getOptionsJson();
+        setOptionsOnQuestionResponse(qr, activeQ.getOptionsJson());
         qr.status = activeQ.getStatus();
         qr.branchType = activeQ.getBranchType();
         qr.expiresAt = activeQ.getExpiresAt();
@@ -234,13 +237,16 @@ public class GameplayController {
         
         boolean correct = q.getCorrectOptionId() != null && q.getCorrectOptionId().equals(selectedOptionId);
         q.setWasCorrect(correct);
-        q.setStatus(correct ? "CORRECT" : "WRONG");
+        q.setStatus(correct ? "ANSWERED_CORRECTLY" : "ANSWERED_WRONGLY");
         persist.update(q);
 
         GameplayActionResponse res = new GameplayActionResponse(true, "Answer processed");
         res.isCorrect = correct;
 
         if (correct) {
+            participant.setConsecutiveWrongCount(0);
+            participant.setConsecutiveNoProgressCount(0);
+            
             double finalScore = scoringService.calculateScore(participant);
             int scoreInt = (int) Math.round(finalScore);
             
@@ -253,12 +259,15 @@ public class GameplayController {
             decisionMeterService.addCorrectAnswerBonus(participant);
             
             int totalAnswered = persist.executeQuery("from RaceQuestionEntity where participantId = :pid and isAnswered = true", Map.of("pid", participant.getId()), RaceQuestionEntity.class).size();
-            long lastLuck = 0; 
-            luckEventService.evaluateLuckEvent(participant, totalAnswered, lastLuck, now);
+            luckEventService.evaluateLuckEvent(participant, totalAnswered, now);
             
             branchingService.handleQuestionAnswered(participant, true, now);
             
         } else {
+            int wrongCount = participant.getConsecutiveWrongCount() != null ? participant.getConsecutiveWrongCount() : 0;
+            participant.setConsecutiveWrongCount(wrongCount + 1);
+            participant.setConsecutiveNoProgressCount(wrongCount + 1);
+            
             branchingService.handleQuestionAnswered(participant, false, now);
         }
 
@@ -327,11 +336,15 @@ public class GameplayController {
         if ("REPLACE".equals(helpType)) {
             activeQ.setIsAnswered(true);
             activeQ.setHelpUsed("REPLACE");
-            activeQ.setStatus("REPLACED");
+            activeQ.setStatus("TIMEOUT");
             persist.update(activeQ);
             
-            QuestionTemplateEntity tmpl = pickTemplate(participant);
-            activeQ = questionGeneratorService.generateQuestion(raceId, participant.getId(), tmpl, null);
+            List<RaceQuestionEntity> existingQs = persist.executeQuery(
+                "from RaceQuestionEntity where participantId = :pid",
+                Map.of("pid", participant.getId()), RaceQuestionEntity.class);
+            
+            QuestionTemplateEntity tmpl = pickTemplate(participant, existingQs);
+            activeQ = questionGeneratorService.generateQuestion(raceId, participant.getId(), tmpl, existingQs);
             activeQ.setHelpUsed("POST_REPLACE");
             persist.save(activeQ);
             broadcastRaceUpdate(raceId);
@@ -345,7 +358,7 @@ public class GameplayController {
         QuestionResponse qr = new QuestionResponse();
         qr.questionId = activeQ.getId();
         qr.questionText = activeQ.getQuestionText();
-        qr.optionsJson = activeQ.getOptionsJson();
+        setOptionsOnQuestionResponse(qr, activeQ.getOptionsJson());
         qr.status = activeQ.getStatus();
         qr.branchType = activeQ.getBranchType();
         qr.expiresAt = activeQ.getExpiresAt();
@@ -356,7 +369,7 @@ public class GameplayController {
         return qr;
     }
 
-    private QuestionTemplateEntity pickTemplate(RaceParticipantEntity participant) {
+    private QuestionTemplateEntity pickTemplate(RaceParticipantEntity participant, List<RaceQuestionEntity> existingQs) {
         List<QuestionTemplateEntity> allTemplates = persist.list(QuestionTemplateEntity.class);
         if (allTemplates.isEmpty()) throw new RuntimeException("No templates");
         
@@ -370,7 +383,41 @@ public class GameplayController {
         List<QuestionTemplateEntity> branchTmpls = active.stream().filter(t -> cb.equals(t.getBranchCompatibility())).collect(Collectors.toList());
         if (branchTmpls.isEmpty()) branchTmpls = active;
         
-        return branchTmpls.get(random.nextInt(branchTmpls.size()));
+        if (existingQs == null || existingQs.isEmpty()) {
+            return branchTmpls.get(random.nextInt(branchTmpls.size()));
+        }
+
+        List<RaceQuestionEntity> recent = existingQs.stream()
+            .filter(q -> q.getAnsweredAt() != null)
+            .sorted((a,b) -> Long.compare(b.getAnsweredAt(), a.getAnsweredAt()))
+            .collect(Collectors.toList());
+
+        List<Long> recentTemplateIds = recent.stream().limit(5).map(RaceQuestionEntity::getTemplateId).collect(Collectors.toList());
+        
+        String fam1 = null; String fam2 = null;
+        if (recent.size() >= 1) fam1 = getTemplateFamilyById(allTemplates, recent.get(0).getTemplateId());
+        if (recent.size() >= 2) fam2 = getTemplateFamilyById(allTemplates, recent.get(1).getTemplateId());
+        
+        String bannedFamily = null;
+        if (fam1 != null && fam1.equals(fam2)) bannedFamily = fam1;
+        final String finalBannedFamily = bannedFamily;
+        
+        List<QuestionTemplateEntity> candidates = branchTmpls.stream()
+            .filter(t -> !recentTemplateIds.contains(t.getId()))
+            .filter(t -> finalBannedFamily == null || !finalBannedFamily.equals(t.getTemplateFamily()))
+            .collect(Collectors.toList());
+            
+        if (candidates.isEmpty()) {
+            candidates = branchTmpls;
+        }
+        
+        return candidates.get(random.nextInt(candidates.size()));
+    }
+
+    private String getTemplateFamilyById(List<QuestionTemplateEntity> list, Long id) {
+        if (id == null) return null;
+        QuestionTemplateEntity tmpl = list.stream().filter(t -> id.equals(t.getId())).findFirst().orElse(null);
+        return tmpl != null ? tmpl.getTemplateFamily() : null;
     }
 
     private UserEntity getStudentByToken(String token) {
@@ -396,6 +443,10 @@ public class GameplayController {
     }
 
     private boolean isHelpEligibleNow(Long raceId, RaceParticipantEntity participant) {
+        int wrongCount = participant.getConsecutiveWrongCount() != null ? participant.getConsecutiveWrongCount() : 0;
+        int noProgress = participant.getConsecutiveNoProgressCount() != null ? participant.getConsecutiveNoProgressCount() : 0;
+        if (wrongCount < 3 && noProgress < 3) return false;
+
         List<RaceParticipantEntity> parts = persist.executeQuery(
             "from RaceParticipantEntity where raceId = :rid", 
             Map.of("rid", raceId), RaceParticipantEntity.class);
@@ -409,5 +460,15 @@ public class GameplayController {
         int ptsDiff = leader.getPoints() - (participant.getPoints() == null ? 0 : participant.getPoints());
         
         return posDiff >= GameConstants.BEHIND_DISTANCE_THRESHOLD || ptsDiff >= GameConstants.BEHIND_POINTS_THRESHOLD;
+    }
+
+    private void setOptionsOnQuestionResponse(QuestionResponse qr, String optionsJson) {
+        if (optionsJson == null) return;
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            qr.options = mapper.readValue(optionsJson, new com.fasterxml.jackson.core.type.TypeReference<java.util.List<QuestionResponse.Option>>() {});
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -41,45 +41,76 @@ public class QuestionGeneratorService {
 
         int num1 = 0, num2 = 0;
         double correctAnswerVal = 0;
-        boolean valid = false;
+        String correctAnswerStr = "";
+        String fingerprint = "";
+        int correctIndex = 0;
+        StringBuilder optionsJson = new StringBuilder();
         
-        while (!valid) {
-            num1 = min + random.nextInt(max - min + 1);
-            num2 = min + random.nextInt(max - min + 1);
-            
-            switch (operator) {
-                case "+": 
-                    correctAnswerVal = num1 + num2; 
-                    valid = true;
-                    break;
-                case "-": 
-                    correctAnswerVal = num1 - num2; 
-                    valid = true;
-                    break;
-                case "*": 
-                    correctAnswerVal = num1 * num2; 
-                    valid = true;
-                    break;
-                case "/": 
-                    if (num2 == 0) continue;
-                    if (!allowsDecimal) {
-                        if (num1 % num2 == 0) {
-                            correctAnswerVal = (double) num1 / num2;
-                            valid = true;
+        boolean foundUnique = false;
+        for (int attempt = 0; attempt < 5; attempt++) {
+            boolean valid = false;
+            while (!valid) {
+                num1 = min + random.nextInt(max - min + 1);
+                num2 = min + random.nextInt(max - min + 1);
+                
+                switch (operator) {
+                    case "+": 
+                        correctAnswerVal = num1 + num2; 
+                        valid = true;
+                        break;
+                    case "-": 
+                        correctAnswerVal = num1 - num2; 
+                        valid = true;
+                        break;
+                    case "*": 
+                        correctAnswerVal = num1 * num2; 
+                        valid = true;
+                        break;
+                    case "/": 
+                        if (num2 == 0) continue;
+                        if (!allowsDecimal) {
+                            if (num1 % num2 == 0) {
+                                correctAnswerVal = (double) num1 / num2;
+                                valid = true;
+                            }
+                        } else {
+                            if ((num1 * 10) % num2 == 0) {
+                                correctAnswerVal = (double) num1 / num2;
+                                valid = true;
+                            }
                         }
-                    } else {
-                        if ((num1 * 10) % num2 == 0) {
-                            correctAnswerVal = (double) num1 / num2;
-                            valid = true;
-                        }
+                        break;
+                    default:
+                        throw new IllegalArgumentException("Unsupported operator: " + operator);
+                }
+            }
+
+            int norm1 = Math.max(num1, num2);
+            int norm2 = Math.min(num1, num2);
+            if (operator.equals("-") || operator.equals("/")) {
+                norm1 = num1;
+                norm2 = num2;
+            }
+            fingerprint = String.format("%d_%s_%d_%d_%s_%d", 
+                    template.getId(), operator, norm1, norm2, template.getBranchCompatibility(), template.getDifficulty());
+                    
+            boolean isRecent = false;
+            if (existingQuestions != null) {
+                for (RaceQuestionEntity eq : existingQuestions) {
+                    if (fingerprint.equals(eq.getFingerprint()) && eq.getAnsweredAt() != null) {
+                        isRecent = true;
+                        break;
                     }
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unsupported operator: " + operator);
+                }
+            }
+            
+            if (!isRecent) {
+                foundUnique = true;
+                break;
             }
         }
 
-        String correctAnswerStr = formatNumber(correctAnswerVal, allowsDecimal, maxDecimals);
+        correctAnswerStr = formatNumber(correctAnswerVal, allowsDecimal, maxDecimals);
 
         Set<String> optionsSet = new LinkedHashSet<>();
         optionsSet.add(correctAnswerStr);
@@ -91,7 +122,6 @@ public class QuestionGeneratorService {
         else if (operator.equals("/")) distractor1Val = (double) num1 * num2;
         
         optionsSet.add(formatNumber(distractor1Val, allowsDecimal, maxDecimals));
-        
         optionsSet.add(formatNumber(correctAnswerVal + 10, allowsDecimal, maxDecimals));
         optionsSet.add(formatNumber(correctAnswerVal - 10, allowsDecimal, maxDecimals));
         optionsSet.add(formatNumber(correctAnswerVal + 1, allowsDecimal, maxDecimals));
@@ -109,23 +139,14 @@ public class QuestionGeneratorService {
         }
         
         Collections.shuffle(options);
-        int correctIndex = options.indexOf(correctAnswerStr);
+        correctIndex = options.indexOf(correctAnswerStr);
         
-        StringBuilder optionsJson = new StringBuilder("[");
+        optionsJson.append("[");
         for (int i = 0; i < options.size(); i++) {
             optionsJson.append("{\"id\":").append(i).append(",\"text\":\"").append(options.get(i)).append("\"}");
             if (i < options.size() - 1) optionsJson.append(",");
         }
         optionsJson.append("]");
-
-        int norm1 = Math.max(num1, num2);
-        int norm2 = Math.min(num1, num2);
-        if (operator.equals("-") || operator.equals("/")) {
-            norm1 = num1;
-            norm2 = num2;
-        }
-        String fingerprint = String.format("%d_%s_%d_%d_%s_%d", 
-                template.getId(), operator, norm1, norm2, template.getBranchCompatibility(), template.getDifficulty());
 
         RaceQuestionEntity newQuestion = new RaceQuestionEntity();
         newQuestion.setRaceId(raceId);

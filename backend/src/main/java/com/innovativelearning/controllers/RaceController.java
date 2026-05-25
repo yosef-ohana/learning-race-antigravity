@@ -89,7 +89,10 @@ public class RaceController {
         participant.setCorrectStreakAtLevel(0);
         participant.setWrongStreakAtLevel(0);
         participant.setSpeedMultiplierUntil(0L);
-        participant.setLastDecisionMeterUpdate(System.currentTimeMillis());
+        participant.setCurrentState(com.innovativelearning.enums.ParticipantState.NORMAL);
+        participant.setActiveLuckMultiplier(1.0);
+        participant.setQuestionsAnsweredInCurrentState(0);
+        participant.setLastDecisionMeterUpdate(System.currentTimeMillis() / 1000);
         persist.save(participant);
 
         return new RaceActionResponse(true, "Joined", race.getId(), race.getRoomCode(), race.getStatus()) {{
