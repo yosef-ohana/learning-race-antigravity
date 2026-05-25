@@ -1,8 +1,4 @@
 import React, { useState } from 'react';
-import Layout from '../components/Layout';
-import Card from '../components/Card';
-import Input from '../components/Input';
-import Button from '../components/Button';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { COOKIE_STUDENT_TOKEN, COOKIE_RACE_ID } from '../config/cookieNames';
@@ -14,10 +10,13 @@ const StudentJoinPage = () => {
   const [raceCode, setRaceCode] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleJoin = async (e) => {
     e.preventDefault();
+    setError('');
+    setIsLoading(true);
     try {
       const formData = new URLSearchParams();
       formData.append('raceCode', raceCode.toUpperCase());
@@ -29,27 +28,88 @@ const StudentJoinPage = () => {
         Cookies.set(COOKIE_RACE_ID, res.data.raceId);
         navigate(ROUTES.STUDENT_LOBBY(res.data.raceCode));
       } else {
-        setError(res.data.message);
+        setError(res.data.message || 'שגיאה בהצטרפות');
       }
     } catch (err) {
-      setError('Join failed.');
+      setError('ההצטרפות נכשלה. אנא נסה שוב.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <Layout>
-      <div className="auth-page">
-        <Card className="auth-box">
-          <h2 style={{marginTop: 0}}>Join a Race</h2>
-          {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
-          <form onSubmit={handleJoin}>
-            <Input type="text" value={raceCode} onChange={e => setRaceCode(e.target.value)} placeholder="Room Code (e.g. ABC123)" required />
-            <Input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} placeholder="Your Name" required />
-            <Button type="submit" style={{width: '100%'}}>Join</Button>
-          </form>
-        </Card>
+    <div className="join-page-container">
+      <div className="join-page-bg"></div>
+      
+      <div className="join-header">
+        <h1 className="join-title">
+          Math Race
+          <div className="checkered-flag-icon">
+            <div/><div/><div/>
+            <div/><div/><div/>
+            <div/><div/><div/>
+          </div>
+        </h1>
+        <div className="join-subtitle">מרוץ חשבון חווייתי בזמן אמת</div>
       </div>
-    </Layout>
+
+      <div className="join-card">
+        <h2>הצטרפות למירוץ</h2>
+        <p>היכנסו, הצטרפו לחדר והתחילו לשחק!</p>
+        
+        {error && (
+          <div className="glow-card-danger" style={{ 
+            marginBottom: '1.5rem', 
+            color: '#ffaa00', 
+            border: '1px solid #ffaa00', 
+            padding: '10px', 
+            borderRadius: '8px', 
+            background: 'rgba(255,170,0,0.1)' 
+          }}>
+            {error}
+          </div>
+        )}
+        
+        <form onSubmit={handleJoin}>
+          <div className="join-input-group">
+            <input 
+              type="text" 
+              className="join-input"
+              value={displayName} 
+              onChange={e => setDisplayName(e.target.value)} 
+              placeholder="שם תלמיד" 
+              required 
+              disabled={isLoading}
+            />
+            <svg className="input-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          
+          <div className="join-input-group">
+            <input 
+              type="text" 
+              className="join-input"
+              value={raceCode} 
+              onChange={e => setRaceCode(e.target.value)} 
+              placeholder="קוד חדר" 
+              required 
+              disabled={isLoading}
+            />
+            <svg className="input-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"></path>
+            </svg>
+          </div>
+
+          <button type="submit" className="join-btn" disabled={isLoading}>
+            <span style={{ fontSize: '1.2rem', opacity: 0.8 }}>&lt;&lt;</span>
+            <span>{isLoading ? 'מתחבר...' : 'הצטרפות למירוץ'}</span>
+            <span style={{ fontSize: '1.2rem', opacity: 0.8 }}>&gt;&gt;</span>
+          </button>
+        </form>
+      </div>
+    </div>
   );
 };
 
