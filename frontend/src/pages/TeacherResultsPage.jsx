@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Leaderboard from '../components/Leaderboard';
+import CarIcon, { getParticipantColor } from '../components/CarIcon';
 import axios from 'axios';
 import Cookies from 'js-cookie';
 import { COOKIE_TEACHER_TOKEN } from '../config/cookieNames';
@@ -7,7 +8,7 @@ import { API_BASE } from '../config/Constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
 
-const PodiumItem = ({ place, data }) => {
+const PodiumItem = ({ place, data, leaderboard }) => {
   if (!data) return null;
   const colors = {
     1: 'var(--neon-orange)', 
@@ -28,12 +29,7 @@ const PodiumItem = ({ place, data }) => {
       <div className="t-podium-points" style={{ color: color, textShadow: `0 0 5px ${color}` }}>{data.points}</div>
       
       <div className="t-podium-car">
-        <svg width="120" height="60" viewBox="0 0 40 20" style={{ filter: `drop-shadow(0 0 15px ${color})` }}>
-          <path d="M5 15 L 5 5 L 10 5 L 15 0 L 30 0 L 35 5 L 35 15 Z" fill={color}/>
-          <circle cx="10" cy="15" r="4" fill="#111"/>
-          <circle cx="30" cy="15" r="4" fill="#111"/>
-          <rect x="18" y="2" width="10" height="4" fill="rgba(255,255,255,0.8)" />
-        </svg>
+        <CarIcon color={getParticipantColor(data, leaderboard, place - 1)} width={120} height={60} />
       </div>
       <div className="t-podium-glow-base" style={{ background: color, boxShadow: `0 0 30px ${color}` }}></div>
     </div>
@@ -112,14 +108,14 @@ const TeacherResultsPage = () => {
           </div>
           
           <div className="t-podium-grid">
-            {second && <PodiumItem place={2} data={second} />}
-            {first && <PodiumItem place={1} data={first} />}
-            {third && <PodiumItem place={3} data={third} />}
+            {second && <PodiumItem place={2} data={second} leaderboard={results.leaderboard} />}
+            {first && <PodiumItem place={1} data={first} leaderboard={results.leaderboard} />}
+            {third && <PodiumItem place={3} data={third} leaderboard={results.leaderboard} />}
           </div>
           
           {results.summaryStats && (
             <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: '1.2rem', marginTop: '2rem' }}>
-              {results.summaryStats}
+              {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
             </div>
           )}
         </div>

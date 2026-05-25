@@ -10,13 +10,13 @@ const HomePage = () => {
   return (
     <Layout>
       <div style={{ textAlign: 'center', marginTop: '10vh' }}>
-        <h1>Welcome to Innovative Learning Race</h1>
+        <h1>ברוכים הבאים ל-Math Race</h1>
         <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center', marginTop: '2rem' }}>
           <Button onClick={() => navigate(ROUTES.TEACHER_LOGIN)} style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}>
-            I am a Teacher
+            אני מורה
           </Button>
           <Button variant="secondary" onClick={() => navigate(ROUTES.STUDENT_JOIN)} style={{ padding: '1rem 2rem', fontSize: '1.2rem' }}>
-            I am a Student
+            אני תלמיד
           </Button>
         </div>
       </div>

@@ -31,7 +31,7 @@ const TeacherLoginPage = () => {
         setError(res.data.message);
       }
     } catch (err) {
-      setError('Login failed.');
+      setError('ההתחברות נכשלה.');
     }
   };
 
@@ -39,12 +39,12 @@ const TeacherLoginPage = () => {
     <Layout>
       <div className="auth-page">
         <Card className="auth-box">
-          <h2 style={{marginTop: 0}}>Teacher Login</h2>
+          <h2 style={{marginTop: 0}}>התחברות מורה</h2>
           {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}
           <form onSubmit={handleLogin}>
-            <Input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" />
-            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="Password" />
-            <Button type="submit" style={{width: '100%'}}>Login</Button>
+            <Input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="שם משתמש" />
+            <Input type="password" value={password} onChange={e => setPassword(e.target.value)} placeholder="סיסמה" />
+            <Button type="submit" style={{width: '100%'}}>התחברות</Button>
           </form>
         </Card>
       </div>

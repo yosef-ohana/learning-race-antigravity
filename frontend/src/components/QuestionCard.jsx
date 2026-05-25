@@ -4,7 +4,7 @@ import TimerDisplay from './TimerDisplay';
 const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
   const [answer, setAnswer] = useState('');
 
-  if (!question) return <div className="glow-text-blue">Loading question...</div>;
+  if (!question) return <div className="glow-text-blue">טוען שאלה...</div>;
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -21,13 +21,13 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
       <div className="question-left-pane">
         <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
         
-        <div style={{ textAlign: 'center', fontSize: '3rem', margin: '2rem 0', textShadow: '0 0 15px #fff', fontWeight: 'bold' }}>
+        <div style={{ textAlign: 'center', fontSize: 'clamp(1.5rem, 5vh, 2.8rem)', margin: '1rem 0', textShadow: '0 0 15px #fff', fontWeight: 'bold' }}>
           {question.questionText}
         </div>
         
         {question.hintText && (
-          <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.5rem', color: 'var(--neon-green)', textShadow: '0 0 10px var(--neon-green)' }}>
-            💡 Hint: {question.hintText}
+          <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: 'clamp(1rem, 3vh, 1.4rem)', color: 'var(--neon-green)', textShadow: '0 0 10px var(--neon-green)' }}>
+            💡 רמז: {question.hintText}
           </div>
         )}
       </div>
@@ -46,13 +46,13 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
             <input 
               type="text" 
               className="input glow-box-blue" 
-              style={{ fontSize: '2.5rem', padding: '1rem', background: 'rgba(0,0,0,0.5)', border: '2px solid var(--neon-blue)', color: 'var(--neon-blue)', textAlign: 'center', borderRadius: '12px', boxShadow: 'inset 0 0 10px rgba(0,243,255,0.2)' }}
+              style={{ fontSize: 'clamp(1.5rem, 4vh, 2.2rem)', padding: '0.8rem', background: 'rgba(0,0,0,0.5)', border: '2px solid var(--neon-blue)', color: 'var(--neon-blue)', textAlign: 'center', borderRadius: '12px', boxShadow: 'inset 0 0 10px rgba(0,243,255,0.2)' }}
               value={answer} 
               onChange={e => setAnswer(e.target.value)} 
-              placeholder="ENTER ANSWER" 
+              placeholder="הזינו תשובה" 
               autoFocus 
             />
-            <button type="submit" className="option-btn" style={{ width: '100%', marginTop: '1.5rem' }}>SUBMIT</button>
+            <button type="submit" className="option-btn" style={{ width: '100%', marginTop: '1rem' }}>שלח תשובה</button>
           </form>
         )}
       </div>

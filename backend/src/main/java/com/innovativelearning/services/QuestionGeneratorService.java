@@ -8,13 +8,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 @Service
 public class QuestionGeneratorService {
-
-    private final Random random = new Random();
 
     public RaceQuestionEntity generateQuestion(Long raceId, Long participantId, QuestionTemplateEntity template, List<RaceQuestionEntity> existingQuestions) {
         if (existingQuestions != null) {
@@ -31,148 +28,75 @@ public class QuestionGeneratorService {
             throw new IllegalArgumentException("Template is not active");
         }
 
-        boolean allowsDecimal = Boolean.TRUE.equals(template.getAllowsDecimal());
-        int maxDecimals = template.getMaxDecimalPlaces() != null ? template.getMaxDecimalPlaces() : 0;
-        if (maxDecimals > 1) maxDecimals = 1;
-
-        int min = template.getMinValue() != null ? template.getMinValue() : 1;
-        int max = template.getMaxValue() != null ? template.getMaxValue() : 10;
-        String operator = template.getOperator() != null ? template.getOperator() : "+";
-
-        int num1 = 0, num2 = 0;
-        double correctAnswerVal = 0;
-        String correctAnswerStr = "";
-        String fingerprint = "";
-        int correctIndex = 0;
-        StringBuilder optionsJson = new StringBuilder();
+        QuestionTemplateCatalog.WordProblem wp = null;
         
-        boolean foundUnique = false;
         for (int attempt = 0; attempt < 5; attempt++) {
-            boolean valid = false;
-            while (!valid) {
-                num1 = min + random.nextInt(max - min + 1);
-                num2 = min + random.nextInt(max - min + 1);
-                
-                switch (operator) {
-                    case "+": 
-                        correctAnswerVal = num1 + num2; 
-                        valid = true;
-                        break;
-                    case "-": 
-                        correctAnswerVal = num1 - num2; 
-                        valid = true;
-                        break;
-                    case "*": 
-                        correctAnswerVal = num1 * num2; 
-                        valid = true;
-                        break;
-                    case "/": 
-                        if (num2 == 0) continue;
-                        if (!allowsDecimal) {
-                            if (num1 % num2 == 0) {
-                                correctAnswerVal = (double) num1 / num2;
-                                valid = true;
-                            }
-                        } else {
-                            if ((num1 * 10) % num2 == 0) {
-                                correctAnswerVal = (double) num1 / num2;
-                                valid = true;
-                            }
-                        }
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unsupported operator: " + operator);
-                }
-            }
-
-            int norm1 = Math.max(num1, num2);
-            int norm2 = Math.min(num1, num2);
-            if (operator.equals("-") || operator.equals("/")) {
-                norm1 = num1;
-                norm2 = num2;
-            }
-            fingerprint = String.format("%d_%s_%d_%d_%s_%d", 
-                    template.getId(), operator, norm1, norm2, template.getBranchCompatibility(), template.getDifficulty());
-                    
+            wp = QuestionTemplateCatalog.generate(template);
             boolean isRecent = false;
             if (existingQuestions != null) {
                 for (RaceQuestionEntity eq : existingQuestions) {
-                    if (fingerprint.equals(eq.getFingerprint()) && eq.getAnsweredAt() != null) {
+                    if (wp.fingerprint.equals(eq.getFingerprint()) && eq.getAnsweredAt() != null) {
                         isRecent = true;
                         break;
                     }
                 }
             }
-            
-            if (!isRecent) {
-                foundUnique = true;
-                break;
+            if (!isRecent) break;
+        }
+
+        Set<Integer> validOptions = new LinkedHashSet<>();
+        validOptions.add(wp.correctAnswer);
+        
+        for (Integer d : wp.distractors) {
+            if (d >= 0) { 
+                validOptions.add(d);
             }
         }
-
-        correctAnswerStr = formatNumber(correctAnswerVal, allowsDecimal, maxDecimals);
-
-        Set<String> optionsSet = new LinkedHashSet<>();
-        optionsSet.add(correctAnswerStr);
         
-        double distractor1Val = 0;
-        if (operator.equals("+")) distractor1Val = num1 - num2;
-        else if (operator.equals("-")) distractor1Val = num1 + num2;
-        else if (operator.equals("*")) distractor1Val = (num2 != 0) ? (double) num1 / num2 : num1 + num2;
-        else if (operator.equals("/")) distractor1Val = (double) num1 * num2;
-        
-        optionsSet.add(formatNumber(distractor1Val, allowsDecimal, maxDecimals));
-        optionsSet.add(formatNumber(correctAnswerVal + 10, allowsDecimal, maxDecimals));
-        optionsSet.add(formatNumber(correctAnswerVal - 10, allowsDecimal, maxDecimals));
-        optionsSet.add(formatNumber(correctAnswerVal + 1, allowsDecimal, maxDecimals));
-        optionsSet.add(formatNumber(correctAnswerVal - 1, allowsDecimal, maxDecimals));
-        
-        List<String> options = new ArrayList<>();
-        for (String opt : optionsSet) {
-            options.add(opt);
-            if (options.size() == 4) break;
+        int offset = 1;
+        while (validOptions.size() < 4) {
+            int candidate1 = wp.correctAnswer + offset;
+            int candidate2 = wp.correctAnswer - offset;
+            if (candidate1 >= 0) validOptions.add(candidate1);
+            if (validOptions.size() < 4 && candidate2 >= 0) validOptions.add(candidate2);
+            offset++;
         }
         
-        while (options.size() < 4) {
-            options.add(formatNumber(correctAnswerVal + random.nextInt(20) + 2, allowsDecimal, maxDecimals));
-            options = new ArrayList<>(new LinkedHashSet<>(options));
+        List<Integer> finalOptions = new ArrayList<>();
+        for (Integer opt : validOptions) {
+            finalOptions.add(opt);
+            if (finalOptions.size() == 4) break;
         }
         
-        Collections.shuffle(options);
-        correctIndex = options.indexOf(correctAnswerStr);
+        Collections.shuffle(finalOptions);
+        int correctIndex = finalOptions.indexOf(wp.correctAnswer);
         
+        StringBuilder optionsJson = new StringBuilder();
         optionsJson.append("[");
-        for (int i = 0; i < options.size(); i++) {
-            optionsJson.append("{\"id\":").append(i).append(",\"text\":\"").append(options.get(i)).append("\"}");
-            if (i < options.size() - 1) optionsJson.append(",");
+        for (int i = 0; i < finalOptions.size(); i++) {
+            optionsJson.append("{\"id\":").append(i).append(",\"text\":\"").append(finalOptions.get(i)).append("\"}");
+            if (i < finalOptions.size() - 1) optionsJson.append(",");
         }
         optionsJson.append("]");
+
+        int timeToLive = template.getBaseTimeSeconds() != null && template.getBaseTimeSeconds() > 0 ? template.getBaseTimeSeconds() : 60;
 
         RaceQuestionEntity newQuestion = new RaceQuestionEntity();
         newQuestion.setRaceId(raceId);
         newQuestion.setParticipantId(participantId);
         newQuestion.setTemplateId(template.getId());
-        newQuestion.setQuestionText(num1 + " " + operator + " " + num2 + " = ?");
-        newQuestion.setCorrectAnswer(correctAnswerStr);
+        newQuestion.setQuestionText(wp.questionText);
+        newQuestion.setCorrectAnswer(String.valueOf(wp.correctAnswer));
         newQuestion.setDifficulty(template.getDifficulty());
         newQuestion.setBranchType(template.getBranchCompatibility());
         newQuestion.setIssuedAt(System.currentTimeMillis() / 1000);
-        newQuestion.setExpiresAt(newQuestion.getIssuedAt() + 60);
+        newQuestion.setExpiresAt(newQuestion.getIssuedAt() + timeToLive);
         newQuestion.setIsAnswered(false);
         newQuestion.setStatus("OPEN");
-        newQuestion.setFingerprint(fingerprint);
+        newQuestion.setFingerprint(wp.fingerprint);
         newQuestion.setOptionsJson(optionsJson.toString());
         newQuestion.setCorrectOptionId(correctIndex);
 
         return newQuestion;
-    }
-
-    private String formatNumber(double value, boolean allowsDecimal, int maxDecimals) {
-        if (!allowsDecimal) {
-            return String.valueOf((long) Math.round(value));
-        } else {
-            String format = "%." + maxDecimals + "f";
-            return String.format(java.util.Locale.US, format, value);
-        }
     }
 }

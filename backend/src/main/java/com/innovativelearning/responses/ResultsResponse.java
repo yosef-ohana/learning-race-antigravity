@@ -18,5 +18,6 @@ public class ResultsResponse {
         public String displayName;
         public int points;
         public int position;
+        public boolean isCurrentUser;
     }
 }

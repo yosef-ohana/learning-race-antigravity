@@ -37,6 +37,9 @@ const TeacherLobbyPage = () => {
         if (isMounted) fetchLobby();
       },
       events: {
+        'lobby-participants-updated': () => {
+          if (isMounted) fetchLobby();
+        },
         'participant-progress-updated': () => {
           if (isMounted) fetchLobby();
         },

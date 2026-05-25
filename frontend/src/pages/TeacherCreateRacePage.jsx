@@ -34,7 +34,7 @@ const TeacherCreateRacePage = () => {
         alert(res.data.message);
       }
     } catch (err) {
-      alert('Error creating race');
+      alert('שגיאה ביצירת המרוץ');
     }
   };
 
@@ -42,10 +42,10 @@ const TeacherCreateRacePage = () => {
     <Layout>
       <div className="auth-page">
         <Card className="auth-box">
-          <h2 style={{marginTop: 0}}>Create New Race</h2>
+          <h2 style={{marginTop: 0}}>יצירת מרוץ חדש</h2>
           <form onSubmit={handleCreate}>
-            <Input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="Race Title" />
-            <Button type="submit" style={{width: '100%'}}>Create Race</Button>
+            <Input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="כותרת המרוץ" />
+            <Button type="submit" style={{width: '100%'}}>צור מרוץ</Button>
           </form>
         </Card>
       </div>

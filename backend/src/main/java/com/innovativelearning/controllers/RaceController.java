@@ -99,6 +99,7 @@ public class RaceController {
         participant.setQuestionsAnsweredInCurrentState(0);
         participant.setLastDecisionMeterUpdate(System.currentTimeMillis() / 1000);
         persist.save(participant);
+        sseManager.sendEvent(race.getId(), "lobby-participants-updated", "");
 
         return new RaceActionResponse(true, "Joined", race.getId(), race.getRoomCode(), race.getStatus()) {{
             this.studentToken = student.getToken();
@@ -154,6 +155,7 @@ public class RaceController {
     public ResultsResponse getResults(@RequestParam String token, @RequestParam Long raceId) {
         List<RaceParticipantEntity> parts = persist.executeQuery("from RaceParticipantEntity where raceId = :rid", Map.of("rid", raceId), RaceParticipantEntity.class);
         com.innovativelearning.utils.RaceUtils.sortParticipants(parts);
+        UserEntity currentUser = persist.executeQuerySingle("from UserEntity where token = :t", Map.of("t", token), UserEntity.class);
         ResultsResponse res = new ResultsResponse();
         res.leaderboard = new ArrayList<>();
         int rank = 1;
@@ -165,6 +167,7 @@ public class RaceController {
             le.displayName = u.getDisplayName();
             le.points = p.getPoints();
             le.position = p.getPosition();
+            le.isCurrentUser = (currentUser != null && currentUser.getId().equals(u.getId()));
             res.leaderboard.add(le);
         }
         if (!res.leaderboard.isEmpty()) {
