@@ -55,6 +55,15 @@
         <property name="finished" column="finished" type="boolean"/>
         <property name="finishRank" column="finish_rank" type="int"/>
         <property name="lastActionAt" column="last_action_at" type="long"/>
+        
+        <property name="currentState" column="current_state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">com.innovativelearning.enums.ParticipantState</param>
+                <param name="useNamed">true</param>
+            </type>
+        </property>
+        <property name="activeLuckMultiplier" column="active_luck_multiplier" type="double"/>
+        <property name="questionsAnsweredInCurrentState" column="questions_answered_in_current_state" type="int"/>
     </class>
 
     <class name="QuestionTemplateEntity" table="question_templates">
@@ -69,6 +78,15 @@
         <property name="maxValue" column="max_value" type="int"/>
         <property name="baseTimeSeconds" column="base_time_seconds" type="int"/>
         <property name="isActive" column="is_active" type="boolean"/>
+        
+        <property name="templateFamily" column="template_family" type="string"/>
+        <property name="logicTag" column="logic_tag" type="string"/>
+        <property name="antiRepeatGroup" column="anti_repeat_group" type="string"/>
+        <property name="difficultyBand" column="difficulty_band" type="int"/>
+        <property name="branchCompatibility" column="branch_compatibility" type="string"/>
+        <property name="stepsCount" column="steps_count" type="int"/>
+        <property name="allowsDecimal" column="allows_decimal" type="boolean"/>
+        <property name="maxDecimalPlaces" column="max_decimal_places" type="int"/>
     </class>
 
     <class name="RaceQuestionEntity" table="race_questions">
@@ -88,6 +106,11 @@
         <property name="isAnswered" column="is_answered" type="boolean"/>
         <property name="wasCorrect" column="was_correct" type="boolean"/>
         <property name="helpUsed" column="help_used" type="string"/>
+        
+        <property name="optionsJson" column="options_json" type="string"/>
+        <property name="correctOptionId" column="correct_option_id" type="int"/>
+        <property name="fingerprint" column="fingerprint" type="string"/>
+        <property name="status" column="status" type="string"/>
     </class>
 
 </hibernate-mapping>

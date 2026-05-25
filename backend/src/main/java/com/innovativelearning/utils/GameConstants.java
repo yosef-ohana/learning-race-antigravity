@@ -25,6 +25,7 @@ public class GameConstants {
     public static final int HIGHWAY_PROGRESS_EQUIVALENT = 8;
     public static final int HIGHWAY_POINTS_MULTIPLIER = 3;
     public static final int HIGHWAY_FAIL_FREEZE_SECONDS = 2;
+    public static final int HIGHWAY_FREEZE_SECONDS = 2;
     
     public static final int DIRT_ROAD_QUESTION_COUNT = 3;
     public static final int DIRT_ROAD_PROGRESS_PER_CORRECT = 10;

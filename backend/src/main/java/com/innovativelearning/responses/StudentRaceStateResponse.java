@@ -16,5 +16,10 @@ public class StudentRaceStateResponse {
         public boolean isBehind;
         public boolean hasPendingDecision;
         public boolean hasPendingHelpChoice;
+        public String currentState;
+        public Double activeLuckMultiplier;
+        public int decisionMeter;
+        public Long freezeUntil;
+        public int rank;
     }
 }

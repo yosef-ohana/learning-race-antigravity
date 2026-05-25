@@ -13,5 +13,10 @@ public class DashboardSnapshotResponse {
         public String displayName;
         public int position;
         public int points;
+        public int rank;
+        public String currentState;
+        public Double activeLuckMultiplier;
+        public int decisionMeter;
+        public Long freezeUntil;
     }
 }
