@@ -44,7 +44,7 @@ const StudentLobbyPage = () => {
         if (isMounted) checkState();
       },
       events: {
-        'state-update': () => {
+        'race-started': () => {
           if (isMounted) checkState();
         }
       }

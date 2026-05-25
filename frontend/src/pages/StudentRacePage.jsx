@@ -3,10 +3,9 @@ import RaceTrack from '../components/RaceTrack';
 import PathChoiceModal from '../components/PathChoiceModal';
 import QuestionCard from '../components/QuestionCard';
 import HelpChoiceModal from '../components/HelpChoiceModal';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import { COOKIE_STUDENT_TOKEN } from '../config/cookieNames';
-import { API_BASE } from '../config/Constants';
+import { fetchStudentRaceState, fetchCurrentQuestion, submitAnswer, choosePath, useHelp } from '../services/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
 import { createSSEConnection } from '../services/sse';
@@ -19,23 +18,24 @@ const StudentRacePage = () => {
   const [sseError, setSseError] = useState(false);
   const [isAnswering, setIsAnswering] = useState(false);
   const [frozenTimeRemaining, setFrozenTimeRemaining] = useState(0);
+  const [helpSkippedForCurrent, setHelpSkippedForCurrent] = useState(false);
   const navigate = useNavigate();
 
   const token = Cookies.get(COOKIE_STUDENT_TOKEN);
 
   const fetchStateAndQuestion = async () => {
     try {
-      const stateRes = await axios.get(`${API_BASE}/get-student-race-state`, { params: { token, raceId } });
+      const stateRes = await fetchStudentRaceState(raceId);
       const newState = stateRes.data;
       setState(newState);
 
-      if (newState.raceStatus === 'FINISHED' || (newState.playerState && newState.playerState.position >= 1000)) {
+      if (newState.raceStatus === 'FINISHED' || (newState.playerState && newState.playerState.raceFinished)) {
         navigate(ROUTES.STUDENT_RESULTS(raceId));
         return;
       }
 
       if (newState.canPlay && !newState.playerState.hasPendingDecision && !newState.playerState.hasPendingHelpChoice && newState.playerState.status !== 'FROZEN') {
-        const qRes = await axios.get(`${API_BASE}/get-current-question`, { params: { token, raceId } });
+        const qRes = await fetchCurrentQuestion(raceId);
         if (qRes.data) {
           setQuestion(qRes.data);
         } else {
@@ -67,7 +67,7 @@ const StudentRacePage = () => {
         }
       },
       events: {
-        'state-update': () => {
+        'participant-progress-updated': () => {
           if (isMounted) fetchStateAndQuestion();
         },
         'race-finished': () => {
@@ -84,9 +84,9 @@ const StudentRacePage = () => {
 
   useEffect(() => {
     let interval = null;
-    if (state?.playerState?.status === 'FROZEN' && state?.playerState?.frozenExpiresAt) {
+    if (state?.playerState?.status === 'FROZEN' && state?.playerState?.freezeUntil) {
       const calculateRemaining = () => {
-        const remaining = Math.max(0, Math.ceil((new Date(state.playerState.frozenExpiresAt).getTime() - Date.now()) / 1000));
+        const remaining = Math.max(0, state.playerState.freezeUntil - Math.floor(Date.now() / 1000));
         setFrozenTimeRemaining(remaining);
       };
       calculateRemaining();
@@ -99,11 +99,7 @@ const StudentRacePage = () => {
 
   const handlePathChoice = async (choice) => {
     try {
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      formData.append('choice', choice);
-      await axios.post(`${API_BASE}/choose-path`, formData);
+      await choosePath(raceId, choice);
       fetchStateAndQuestion();
     } catch (e) {
       console.error(e);
@@ -112,39 +108,24 @@ const StudentRacePage = () => {
 
   const handleHelpChoice = async (choice) => {
     try {
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      formData.append('helpType', choice);
-      await axios.post(`${API_BASE}/use-help`, formData);
+      await useHelp(raceId, choice);
       fetchStateAndQuestion();
     } catch (e) {
       console.error(e);
     }
   };
 
-  const handleSkipHelp = async () => {
-    try {
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      await axios.post(`${API_BASE}/skip-help`, formData);
-      fetchStateAndQuestion();
-    } catch (e) {
-      console.error(e);
-    }
+  const handleSkipHelp = () => {
+    setHelpSkippedForCurrent(true);
+    fetchStateAndQuestion();
   };
 
   const handleSubmitAnswer = async (answer) => {
+    if (isAnswering) return; // Prevent double submit
+    setHelpSkippedForCurrent(false);
     setIsAnswering(true);
     try {
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      formData.append('questionId', question?.questionId || '');
-      formData.append('answer', answer || '');
-
-      const res = await axios.post(`${API_BASE}/submit-answer`, formData);
+      const res = await submitAnswer(raceId, question?.questionId || '', answer);
       if (res.data.success) {
         setEvent(res.data.isCorrect ? 'CORRECT MATCH' : 'SYSTEM ERROR: INCORRECT');
         setQuestion(null);
@@ -200,7 +181,7 @@ const StudentRacePage = () => {
 
         {state.playerState.hasPendingDecision ? (
           <PathChoiceModal isOpen={true} onChoice={handlePathChoice} />
-        ) : state.playerState.hasPendingHelpChoice ? (
+        ) : (state.playerState.hasPendingHelpChoice && !helpSkippedForCurrent) ? (
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
             <HelpChoiceModal isOpen={true} onChoice={handleHelpChoice} onSkip={handleSkipHelp} />
           </div>

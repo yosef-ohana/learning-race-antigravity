@@ -1,33 +1,5 @@
-import React, { useState, useEffect } from 'react';
-
-const TimerDisplay = ({ expiresAt, onExpire }) => {
-  const [percent, setPercent] = useState(100);
-  
-  useEffect(() => {
-    if (!expiresAt) return;
-    const end = new Date(expiresAt).getTime();
-    
-    let interval = setInterval(() => {
-      const now = Date.now();
-      const remaining = Math.max(0, end - now);
-      if (remaining === 0) {
-        setPercent(0);
-        onExpire();
-        clearInterval(interval);
-      } else {
-        // Assume 20 seconds total for the bar depletion calculation 
-        setPercent((remaining / 20000) * 100);
-      }
-    }, 100);
-    return () => clearInterval(interval);
-  }, [expiresAt, onExpire]);
-
-  return (
-    <div className="timer-container">
-      <div className="timer-fill" style={{ width: `${Math.min(100, percent)}%` }}></div>
-    </div>
-  );
-};
+import React, { useState } from 'react';
+import TimerDisplay from './TimerDisplay';
 
 const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
   const [answer, setAnswer] = useState('');
@@ -46,7 +18,7 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <TimerDisplay expiresAt={question.expiresAt} onExpire={onExpire} />
+      <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
       
       <div style={{ textAlign: 'center', fontSize: '2rem', margin: '1rem 0', textShadow: '0 0 10px #fff' }}>
         {question.questionText}
@@ -57,7 +29,7 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
       {hasOptions ? (
         <div className="options-grid">
           {question.options.map((opt, i) => (
-            <button key={i} className="option-btn" onClick={() => onSubmitAnswer(opt.id || opt.text || opt)}>
+            <button key={i} className="option-btn" onClick={() => onSubmitAnswer(opt.id)}>
               {opt.text || opt.label || opt}
             </button>
           ))}

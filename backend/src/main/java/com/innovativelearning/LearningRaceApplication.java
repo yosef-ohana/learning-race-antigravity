@@ -47,35 +47,35 @@ public class LearningRaceApplication {
         if (persist.list(QuestionTemplateEntity.class).isEmpty()) {
             // 1. COUNT_REMAINDER
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "COUNT_REMAINDER", "REMAINDER", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "COUNT_REMAINDER", "+", i, 1, 10, 60);
             }
             // 2. PERCENT_REVERSE
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "PERCENT_REVERSE", "REVERSE", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "PERCENT_REVERSE", "-", i, 1, 10, 60);
             }
             // 3. PERCENT_MULTI
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "PERCENT_MULTI", "MULTI", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "PERCENT_MULTI", "*", i, 1, 10, 60);
             }
             // 4. SPEED_RELATIVE
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "SPEED_RELATIVE", "SPEED", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "SPEED_RELATIVE", "/", i, 1, 10, 60);
             }
             // 5. DIVISION_PACKING
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "DIVISION_PACKING", "PACKING", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "DIVISION_PACKING", "+", i, 1, 10, 60);
             }
             // 6. RATIO
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "RATIO", "RATIO", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "RATIO", "-", i, 1, 10, 60);
             }
             // 7. AVERAGE
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "AVERAGE", "AVERAGE", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "AVERAGE", "*", i, 1, 10, 60);
             }
             // 8. WORK_RATE
             for (int i=1; i<=10; i++) {
-                seedTemplate(persist, "Math", "WORK_RATE", "WORK", i, 0, 0, 60);
+                seedTemplate(persist, "Math", "WORK_RATE", "/", i, 1, 10, 60);
             }
             
             System.out.println("Seeded math templates");

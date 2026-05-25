@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Cookies from 'js-cookie';
 import { COOKIE_TEACHER_TOKEN } from '../config/cookieNames';
-import { API_BASE } from '../config/Constants';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
 import { createSSEConnection } from '../services/sse';
-import { fetchTeacherDashboardSnapshot } from '../services/api';
+import { fetchTeacherDashboardSnapshot, finishRace } from '../services/api';
+import RaceTrack from '../components/RaceTrack';
+import Leaderboard from '../components/Leaderboard';
 
 const TeacherRaceDashboardPage = () => {
   const { raceId } = useParams();
@@ -27,10 +27,7 @@ const TeacherRaceDashboardPage = () => {
             const data = res.data;
             setSnapshot(data);
             
-            const isFinished = data.raceStatus === 'FINISHED';
-            const someoneWon = data.leaderboard && data.leaderboard.some(competitor => competitor.position >= 1000);
-            
-            if (isFinished || someoneWon) {
+            if (data.raceStatus === 'FINISHED') {
               navigate(ROUTES.TEACHER_RESULTS(raceId));
             }
           }
@@ -52,6 +49,9 @@ const TeacherRaceDashboardPage = () => {
         'participant-progress-updated': () => {
           if (isMounted) loadSnapshot();
         },
+        'race-started': () => {
+          if (isMounted) loadSnapshot();
+        },
         'race-finished': () => {
           if (isMounted) navigate(ROUTES.TEACHER_RESULTS(raceId));
         }
@@ -65,12 +65,9 @@ const TeacherRaceDashboardPage = () => {
   }, [raceId, navigate]);
 
   const handleFinishEarly = async () => {
+    if (!window.confirm("האם אתה בטוח שברצונך לסיים את המרוץ?")) return;
     try {
-      const token = Cookies.get(COOKIE_TEACHER_TOKEN);
-      const formData = new URLSearchParams();
-      formData.append('token', token);
-      formData.append('raceId', raceId);
-      await axios.post(`${API_BASE}/finish-race`, formData);
+      await finishRace(raceId);
       navigate(ROUTES.TEACHER_RESULTS(raceId));
     } catch (err) {
       console.error(err);
@@ -93,24 +90,18 @@ const TeacherRaceDashboardPage = () => {
         <div style={{ display: 'flex', alignItems: 'center', gap: '2rem' }}>
           {!sseError && <div className="live-indicator">LIVE</div>}
           <button onClick={handleFinishEarly} className="option-btn" style={{ padding: '1rem', fontSize: '1rem', color: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: '0 0 10px var(--danger)' }}>
-            FORCE OVERRIDE
+            סיום מרוץ
           </button>
         </div>
       </div>
 
-      <div className="projector-track">
-        {snapshot.participantsPositions && snapshot.participantsPositions.map((p) => {
-          const percent = Math.min(100, Math.max(0, (p.position / 1000) * 100)); // standard 1000 cap
-          return (
-            <div key={p.id} className="projector-lane">
-              <div className="projector-lane-name">{p.displayName}</div>
-              <div className="projector-lane-track">
-                <div className="projector-lane-fill" style={{ width: `${percent}%` }}></div>
-              </div>
-              <div className="projector-lane-score">{p.points} PTS</div>
-            </div>
-          );
-        })}
+      <div className="projector-track" style={{ marginTop: '2rem' }}>
+        <RaceTrack participantsPositions={snapshot.participantsPositions} currentUserId={null} />
+      </div>
+
+      <div style={{ marginTop: '2rem', background: 'rgba(0,0,0,0.5)', padding: '1rem', borderRadius: '10px' }}>
+        <h2 style={{ color: 'var(--neon-blue)', marginTop: 0 }}>LIVE LEADERBOARD</h2>
+        <Leaderboard leaderboard={snapshot.leaderboard || snapshot.participantsPositions} />
       </div>
     </div>
   );

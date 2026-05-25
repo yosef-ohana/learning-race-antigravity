@@ -33,6 +33,11 @@ public class RaceController {
         this.sseManager = sseManager;
     }
 
+    @GetMapping("/debug-users")
+    public List<UserEntity> debugUsers() {
+        return persist.list(UserEntity.class);
+    }
+
     @PostMapping("/create-race")
     public RaceActionResponse createRace(@RequestParam String token, @RequestParam String raceTitle) {
         UserEntity teacher = persist.executeQuerySingle("from UserEntity where token = :t", Map.of("t", token), UserEntity.class);
@@ -128,6 +133,7 @@ public class RaceController {
         race.setStatus(RaceStatus.LIVE.name());
         race.setStartedAt(System.currentTimeMillis());
         persist.update(race);
+        sseManager.sendEvent(raceId, "race-started", null);
         return new BasicResponse(true, "Started");
     }
 
@@ -140,6 +146,7 @@ public class RaceController {
         persist.update(race);
         
         com.innovativelearning.utils.RaceUtils.determineWinnerAndLeaderboard(raceId, persist, sseManager);
+        sseManager.sendEvent(raceId, "race-finished", null);
         return new BasicResponse(true, "Finished");
     }
 

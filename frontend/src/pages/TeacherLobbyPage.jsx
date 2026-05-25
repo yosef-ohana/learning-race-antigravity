@@ -42,7 +42,7 @@ const TeacherLobbyPage = () => {
         'participant-progress-updated': () => {
           if (isMounted) fetchLobby();
         },
-        'state-update': () => {
+        'race-started': () => {
           if (isMounted) fetchLobby();
         }
       }

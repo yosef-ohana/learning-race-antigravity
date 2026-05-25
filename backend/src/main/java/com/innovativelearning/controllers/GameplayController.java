@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -84,7 +85,15 @@ public class GameplayController {
             snap.leaderboard.add(pp);
         }
         
-        sseManager.sendEvent(raceId, "race-snapshot", snap);
+        sseManager.sendEvent(raceId, "participant-progress-updated", snap);
+    }
+
+    @GetMapping(value = "/subscribe-student-race", produces = "text/event-stream")
+    public SseEmitter subscribeStudent(@RequestParam String token, @RequestParam Long raceId) {
+        UserEntity student = getStudentByToken(token);
+        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+        sseManager.addEmitter(raceId, emitter);
+        return emitter;
     }
 
     @GetMapping("/get-student-race-state")
@@ -276,6 +285,7 @@ public class GameplayController {
             res.raceFinished = true;
             persist.update(participant);
             com.innovativelearning.utils.RaceUtils.determineWinnerAndLeaderboard(raceId, persist, sseManager);
+            sseManager.sendEvent(raceId, "race-finished", null);
         }
 
         persist.update(participant);
