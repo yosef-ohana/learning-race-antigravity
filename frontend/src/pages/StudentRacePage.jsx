@@ -150,18 +150,33 @@ const StudentRacePage = () => {
         </div>
       )}
 
-      <div className="student-top">
-        <div style={{ display: 'flex', justifyItems: 'space-between', gap: '2rem', marginBottom: '1rem' }}>
-          <div className="glow-card" style={{ flex: 1 }}>POS: {state.playerState.position}m</div>
-          <div className="glow-card-green" style={{ flex: 1 }}>PTS: {state.playerState.points}</div>
+      <div className="student-top" style={{ padding: '2rem' }}>
+        
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', padding: '0 1rem' }}>
+          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
+            <div className="live-indicator" style={{ fontSize: '1rem' }}>LIVE</div>
+            <div className="glow-card" style={{ padding: '0.5rem 1.5rem', fontSize: '1rem', border: '1px solid var(--neon-purple)', color: '#fff' }}>
+              🏆 Rank {state.playerState.rank}/{state.participantsPositions.length}
+            </div>
+          </div>
+          
+          <div className="glow-card" style={{ padding: '0.5rem 2rem', color: 'var(--neon-blue)', borderColor: 'var(--neon-blue)', fontSize: '1.2rem' }}>
+            <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{state.playerState.points}</span> pts
+          </div>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', width: '250px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem', color: 'var(--neon-purple)', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-purple)' }}>
+              <span>DECISION METER</span>
+              <span>{state.playerState.decisionMeter || 0}%</span>
+            </div>
+            <div className="decision-meter" style={{ width: '100%', height: '8px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--neon-purple)' }}>
+              <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter || 0}%`, height: '100%', background: 'var(--neon-purple)', boxShadow: '0 0 10px var(--neon-purple)' }}></div>
+            </div>
+          </div>
         </div>
         
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <RaceTrack participantsPositions={state.participantsPositions} currentUserId={state.playerState.id} />
-          
-          <div className="decision-meter" style={{ marginTop: '1rem', width: '100%', height: '10px' }}>
-            <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter || 0}%`, height: '100%' }}></div>
-          </div>
         </div>
       </div>
 

@@ -9,13 +9,11 @@ const apiClient = axios.create({
 
 export const fetchTeacherDashboardSnapshot = async (raceId) => {
   const token = Cookies.get(COOKIE_TEACHER_TOKEN);
-  // TODO: confirm endpoint
   return apiClient.get('/get-dashboard-snapshot', { params: { token, raceId } });
 };
 
 export const fetchStudentRaceState = async (raceId) => {
   const token = Cookies.get(COOKIE_STUDENT_TOKEN);
-  // TODO: confirm endpoint
   return apiClient.get('/get-student-race-state', { params: { token, raceId } });
 };
 
@@ -53,8 +51,10 @@ export const useHelp = async (raceId, helpType) => {
 };
 
 export const joinRace = async (raceCode, studentName) => {
-  // TODO: confirm endpoint
-  return apiClient.post('/join', { raceCode, studentName });
+  const formData = new URLSearchParams();
+  formData.append('raceCode', raceCode);
+  formData.append('displayName', studentName);
+  return apiClient.post('/join-race', formData);
 };
 
 export const finishRace = async (raceId) => {

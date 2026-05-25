@@ -93,11 +93,11 @@ body {
 .options-grid { display: grid; grid-template-columns: 1fr 1fr; grid-gap: 1.5rem; margin-top: 1rem; flex: 1; }
 .option-btn {
   background: rgba(0, 0, 0, 0.7); border: 2px solid var(--neon-blue); color: var(--neon-blue);
-  font-family: var(--font-main); font-size: 1.5rem; text-transform: uppercase; border-radius: 8px;
-  cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 0 10px rgba(0,243,255,0.2), 0 0 10px var(--neon-blue);
+  font-family: var(--font-main); font-size: 2.5rem; font-weight: bold; text-transform: uppercase; border-radius: 12px;
+  cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 0 10px rgba(0,243,255,0.2), 0 0 10px rgba(0,243,255,0.4);
   display: flex; align-items: center; justify-content: center; padding: 2rem;
 }
-.option-btn:hover { background: var(--neon-blue); color: #000; box-shadow: 0 0 30px var(--neon-blue); }
+.option-btn:hover { background: rgba(0, 243, 255, 0.15); color: #fff; box-shadow: 0 0 30px var(--neon-blue); border-color: #fff; }
 
 .timer-container { height: 15px; background: rgba(0,255,0,0.1); border: 1px solid var(--neon-green); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
 .timer-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.1s linear; }
@@ -125,3 +125,185 @@ body {
 .race-track-container { background: transparent !important; border: 2px solid var(--neon-purple); box-shadow: inset 0 0 15px rgba(188,19,254,0.2); }
 .decision-meter { background: rgba(255,255,255,0.1) !important; border: 1px solid var(--neon-green); }
 .decision-fill { background: var(--neon-green) !important; box-shadow: 0 0 10px var(--neon-green); transition: width 0.5s ease-out !important; }
+
+/* Question Split Layout */
+.question-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  height: 100%;
+}
+.question-left-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-right: 2px solid rgba(0, 243, 255, 0.3);
+  padding-right: 2rem;
+}
+.question-right-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Modal Enhancements */
+.cyberpunk-modal {
+  border-radius: 16px;
+  box-shadow: 0 0 40px var(--neon-blue);
+  background: rgba(5, 5, 16, 0.95);
+  text-align: center;
+}
+.cyberpunk-modal-danger {
+  border-radius: 16px;
+  box-shadow: 0 0 40px var(--danger);
+  border-color: var(--danger);
+  background: rgba(20, 5, 5, 0.95);
+  text-align: center;
+}
+
+/* Path Choice Buttons */
+.btn-highway {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid var(--neon-blue);
+  color: var(--neon-blue);
+  box-shadow: 0 0 15px var(--neon-blue);
+  font-size: 1.2rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-highway:hover {
+  background: rgba(0, 243, 255, 0.2);
+}
+.btn-dirtroad {
+  background: rgba(0,0,0,0.8);
+  border: 2px solid var(--neon-orange);
+  color: var(--neon-orange);
+  box-shadow: 0 0 15px var(--neon-orange);
+  font-size: 1.2rem;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+.btn-dirtroad:hover {
+  background: rgba(255, 170, 0, 0.2);
+}
+
+/* Race Track Customization */
+.lane-highlight {
+  background: rgba(0, 243, 255, 0.1);
+  border-radius: 8px;
+  box-shadow: inset 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+/* Results Split Layout */
+.results-page-container {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  padding: 2rem;
+  height: 100vh;
+}
+.results-left-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--neon-blue);
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,243,255,0.2);
+  padding: 2rem;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+}
+.results-right-pane {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--neon-purple);
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(188,19,254,0.2);
+  padding: 2rem;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  overflow-y: auto;
+}
+
+/* Podium Styles */
+.podium-container {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: auto;
+  margin-bottom: 2rem;
+  height: 300px;
+}
+.podium-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 1rem;
+}
+.podium-rank-1 {
+  width: 140px;
+  height: 250px;
+  background: linear-gradient(to top, rgba(255,170,0,0.2), rgba(255,170,0,0.05));
+  border: 2px solid var(--neon-orange);
+  border-bottom: none;
+  box-shadow: 0 -10px 30px rgba(255,170,0,0.4);
+}
+.podium-rank-2 {
+  width: 130px;
+  height: 200px;
+  background: linear-gradient(to top, rgba(188,19,254,0.2), rgba(188,19,254,0.05));
+  border: 2px solid var(--neon-purple);
+  border-bottom: none;
+  box-shadow: 0 -10px 20px rgba(188,19,254,0.4);
+}
+.podium-rank-3 {
+  width: 120px;
+  height: 150px;
+  background: linear-gradient(to top, rgba(0,243,255,0.2), rgba(0,243,255,0.05));
+  border: 2px solid var(--neon-blue);
+  border-bottom: none;
+  box-shadow: 0 -10px 20px rgba(0,243,255,0.4);
+}
+
+/* Leaderboard Overhaul */
+.leaderboard-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+.leaderboard-row {
+  display: flex;
+  align-items: center;
+  padding: 0.8rem 1rem;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s;
+}
+.leaderboard-row:hover {
+  background: rgba(255,255,255,0.1);
+}
+.leaderboard-badge {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-right: 1.5rem;
+}
+

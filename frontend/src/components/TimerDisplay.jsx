@@ -25,12 +25,12 @@ const TimerDisplay = ({ expiresAt, onExpire }) => {
   const percent = initialTimeLeft > 0 ? (timeLeft / initialTimeLeft) * 100 : 0;
 
   return (
-    <div className="timer-container" style={{ display: 'flex', flexDirection: 'column', width: '100%', marginBottom: '1rem' }}>
-      <div style={{ fontSize: '1.2rem', fontWeight: 'bold', marginBottom: '4px', textAlign: 'center', color: 'var(--neon-blue)' }}>
-        TIME REMAINING: {timeLeft}s
+    <div className="timer-container" style={{ display: 'flex', alignItems: 'center', width: '100%', marginBottom: '1rem', background: 'rgba(0,0,0,0.4)', padding: '0.5rem 1rem', borderRadius: '20px', border: '1px solid rgba(0, 243, 255, 0.3)' }}>
+      <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginRight: '1rem', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)' }}>
+        ⏱️ {String(Math.floor(timeLeft / 60)).padStart(2, '0')}:{String(timeLeft % 60).padStart(2, '0')}
       </div>
-      <div style={{ height: '10px', background: 'rgba(0,0,0,0.5)', borderRadius: '5px', overflow: 'hidden', border: '1px solid var(--neon-blue)' }}>
-        <div className="timer-fill" style={{ height: '100%', background: 'var(--neon-blue)', width: `${Math.min(100, percent)}%`, transition: 'width 0.5s linear' }}></div>
+      <div style={{ flex: 1, height: '8px', background: 'rgba(0,0,0,0.8)', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--neon-blue)' }}>
+        <div className="timer-fill" style={{ height: '100%', background: 'var(--neon-blue)', boxShadow: '0 0 10px var(--neon-blue)', width: `${Math.min(100, percent)}%`, transition: 'width 0.5s linear' }}></div>
       </div>
     </div>
   );

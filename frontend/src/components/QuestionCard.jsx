@@ -17,37 +17,45 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire }) => {
   const hasOptions = question.options && Array.isArray(question.options) && question.options.length > 0;
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-      <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
-      
-      <div style={{ textAlign: 'center', fontSize: '2rem', margin: '1rem 0', textShadow: '0 0 10px #fff' }}>
-        {question.questionText}
+    <div className="question-container">
+      <div className="question-left-pane">
+        <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
+        
+        <div style={{ textAlign: 'center', fontSize: '3rem', margin: '2rem 0', textShadow: '0 0 15px #fff', fontWeight: 'bold' }}>
+          {question.questionText}
+        </div>
+        
+        {question.hintText && (
+          <div style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.5rem', color: 'var(--neon-green)', textShadow: '0 0 10px var(--neon-green)' }}>
+            💡 Hint: {question.hintText}
+          </div>
+        )}
       </div>
       
-      {question.hintText && <div className="glow-text-green" style={{ textAlign: 'center', marginBottom: '1rem', fontSize: '1.2rem' }}>Hint: {question.hintText}</div>}
-      
-      {hasOptions ? (
-        <div className="options-grid">
-          {question.options.map((opt, i) => (
-            <button key={i} className="option-btn" onClick={() => onSubmitAnswer(opt.id)}>
-              {opt.text || opt.label || opt}
-            </button>
-          ))}
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit} style={{ marginTop: 'auto' }}>
-          <input 
-            type="text" 
-            className="input glow-box-blue" 
-            style={{ fontSize: '1.5rem', background: 'transparent', color: 'var(--neon-blue)', textAlign: 'center' }}
-            value={answer} 
-            onChange={e => setAnswer(e.target.value)} 
-            placeholder="ENTER ANSWER" 
-            autoFocus 
-          />
-          <button type="submit" className="option-btn" style={{ width: '100%' }}>SUBMIT</button>
-        </form>
-      )}
+      <div className="question-right-pane">
+        {hasOptions ? (
+          <div className="options-grid">
+            {question.options.map((opt, i) => (
+              <button key={i} className="option-btn" onClick={() => onSubmitAnswer(opt.id)}>
+                {opt.text || opt.label || opt}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', height: '100%', justifyContent: 'center' }}>
+            <input 
+              type="text" 
+              className="input glow-box-blue" 
+              style={{ fontSize: '2.5rem', padding: '1rem', background: 'rgba(0,0,0,0.5)', border: '2px solid var(--neon-blue)', color: 'var(--neon-blue)', textAlign: 'center', borderRadius: '12px', boxShadow: 'inset 0 0 10px rgba(0,243,255,0.2)' }}
+              value={answer} 
+              onChange={e => setAnswer(e.target.value)} 
+              placeholder="ENTER ANSWER" 
+              autoFocus 
+            />
+            <button type="submit" className="option-btn" style={{ width: '100%', marginTop: '1.5rem' }}>SUBMIT</button>
+          </form>
+        )}
+      </div>
     </div>
   );
 };

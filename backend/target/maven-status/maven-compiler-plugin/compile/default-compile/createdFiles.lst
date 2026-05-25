@@ -1,9 +1,0 @@
-com\innovativelearning\services\LuckEventService.class
-com\innovativelearning\utils\RaceUtils.class
-com\innovativelearning\services\ScoringService.class
-com\innovativelearning\controllers\GameplayController$1.class
-com\innovativelearning\enums\ParticipantState.class
-com\innovativelearning\services\DecisionMeterService.class
-com\innovativelearning\services\QuestionGeneratorService.class
-com\innovativelearning\services\BranchingService.class
-com\innovativelearning\responses\QuestionResponse$Option.class

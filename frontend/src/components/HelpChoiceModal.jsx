@@ -5,14 +5,24 @@ import Button from './Button';
 const HelpChoiceModal = ({ isOpen, onChoice, onSkip }) => {
   return (
     <Modal isOpen={isOpen}>
-      <h3 style={{marginTop: 0}}>You're lagging behind!</h3>
-      <p>Do you want to use help for this question?</p>
-      <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-        <Button onClick={() => onChoice('HINT')} variant="secondary">Get a Hint</Button>
-        <Button onClick={() => onChoice('REPLACE')} variant="danger">Replace Question</Button>
-      </div>
-      <div style={{ marginTop: '1rem', textAlign: 'center' }}>
-        <Button onClick={onSkip} variant="primary" style={{ background: '#ccc', color: '#000' }}>Skip</Button>
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <h2 style={{ margin: '0 0 1rem 0', color: 'var(--neon-purple)', textShadow: '0 0 15px var(--neon-purple)', fontSize: '2.5rem' }}>SYSTEM ASSISTANCE</h2>
+        <p style={{ fontSize: '1.2rem', marginBottom: '2rem', color: '#ccc' }}>Options available to bypass this obstacle:</p>
+        
+        <div style={{ display: 'flex', gap: '2rem', justifyContent: 'center' }}>
+          <button className="option-btn" onClick={() => onChoice('HINT')} style={{ flex: 1, flexDirection: 'column', gap: '1rem', padding: '1.5rem', fontSize: '1.5rem', color: 'var(--neon-green)', borderColor: 'var(--neon-green)', boxShadow: 'inset 0 0 10px rgba(0,255,0,0.2)' }}>
+            💡 GET A HINT
+          </button>
+          <button className="option-btn" onClick={() => onChoice('REPLACE')} style={{ flex: 1, flexDirection: 'column', gap: '1rem', padding: '1.5rem', fontSize: '1.5rem', color: 'var(--neon-orange)', borderColor: 'var(--neon-orange)', boxShadow: 'inset 0 0 10px rgba(255,170,0,0.2)' }}>
+            🔄 REPLACE Q
+          </button>
+        </div>
+        
+        <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+          <button className="option-btn" onClick={onSkip} style={{ width: '100%', fontSize: '1.2rem', padding: '1rem', color: '#aaa', borderColor: '#555', boxShadow: 'none' }}>
+            SKIP ASSISTANCE
+          </button>
+        </div>
       </div>
     </Modal>
   );
