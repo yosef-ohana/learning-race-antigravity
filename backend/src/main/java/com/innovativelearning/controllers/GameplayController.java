@@ -167,13 +167,27 @@ public class GameplayController {
         UserEntity student = getStudentByToken(token);
         RaceParticipantEntity participant = getParticipant(raceId, student.getId());
         
+        ParticipantState beforeState = participant.getCurrentState();
+        
         long now = System.currentTimeMillis() / 1000;
         branchingService.checkUnfreeze(participant, now);
         decisionMeterService.calculateMeterOnDemand(participant, now);
         persist.update(participant);
 
-        if (participant.getCurrentState() == ParticipantState.DECISION_PENDING) return null;
-        if (participant.getCurrentState() == ParticipantState.FROZEN) return null;
+        ParticipantState afterState = participant.getCurrentState();
+
+        if (afterState == ParticipantState.DECISION_PENDING) {
+            if (beforeState != afterState) {
+                broadcastRaceUpdate(raceId);
+            }
+            return null;
+        }
+        if (afterState == ParticipantState.FROZEN) {
+            if (beforeState != afterState) {
+                broadcastRaceUpdate(raceId);
+            }
+            return null;
+        }
 
         List<RaceQuestionEntity> existingQs = persist.executeQuery(
             "from RaceQuestionEntity where participantId = :pid",

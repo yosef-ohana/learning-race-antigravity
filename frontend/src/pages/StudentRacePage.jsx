@@ -231,32 +231,37 @@ const StudentRacePage = () => {
 
       <div className="student-bottom">
         {state.playerState.status === 'FROZEN' && (
-          <div className="overlay-blur hebrew-text">
-            <h1 style={{ fontSize: '4rem', margin: 0 }}>🧊 קפוא 🧊</h1>
-            <h2 style={{ fontSize: '2rem', marginTop: '1rem' }}>מערכת נעולה: <span className="bidi-isolate">{frozenTimeRemaining}</span> שניות</h2>
+          <div className="student-feedback-overlay hebrew-text">
+            <div className="student-feedback-card frozen">
+              <div style={{ fontSize: '3rem', animation: 'pulse 1.5s infinite' }}>🧊</div>
+              <h1 style={{ fontSize: '2.2rem', margin: '0.5rem 0', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)' }}>קפוא!</h1>
+              <h2 style={{ fontSize: '1.4rem', margin: 0 }}>מערכת נעולה: <span className="bidi-isolate" style={{ color: 'var(--neon-blue)', fontWeight: 'bold' }}>{frozenTimeRemaining}</span> שניות</h2>
+            </div>
           </div>
         )}
 
         {event && (
-          <div className="overlay-blur hebrew-text" style={{ backgroundColor: 'rgba(0,0,0,0.9)', zIndex: 90 }}>
-            <h1 style={{ fontSize: '3rem', color: event.includes('נכונה') ? 'var(--neon-green)' : 'var(--danger)' }}>{event}</h1>
+          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90 }}>
+            <div className={`student-feedback-card ${event.includes('נכונה') ? 'success' : 'error'}`}>
+              <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>{event.includes('נכונה') ? '🎉' : '💥'}</div>
+              <h1 style={{ fontSize: '2.2rem', margin: 0 }}>{event}</h1>
+            </div>
           </div>
         )}
 
         {luckPopup && (
-          <div className="overlay-blur hebrew-text" style={{ zIndex: 100, backgroundColor: 'rgba(0,0,0,0.85)', pointerEvents: 'none' }}>
-            <h1 style={{ 
-              fontSize: '3rem', 
-              color: luckPopup.type === 'BOOST' ? 'var(--neon-green)' : 'var(--danger)',
-              textShadow: luckPopup.type === 'BOOST' ? '0 0 20px var(--neon-green)' : '0 0 20px var(--danger)',
-              textAlign: 'center',
-              padding: '2rem',
-              border: `2px solid ${luckPopup.type === 'BOOST' ? 'var(--neon-green)' : 'var(--danger)'}`,
-              borderRadius: '12px',
-              backgroundColor: 'rgba(0,0,0,0.5)'
-            }}>
-              {luckPopup.text}
-            </h1>
+          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 100, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
+            <div className={`student-feedback-card luck ${luckPopup.type === 'BOOST' ? 'boost' : 'puncture'}`} style={{ pointerEvents: 'auto' }}>
+              <h1 style={{ 
+                fontSize: '1.6rem', 
+                color: luckPopup.type === 'BOOST' ? 'var(--neon-green)' : 'var(--danger)',
+                textShadow: luckPopup.type === 'BOOST' ? '0 0 15px var(--neon-green)' : '0 0 15px var(--danger)',
+                margin: 0,
+                lineHeight: '1.4'
+              }}>
+                {luckPopup.text}
+              </h1>
+            </div>
           </div>
         )}
 

@@ -73,9 +73,9 @@ const CarIcon = ({ color = '#bc13fe', width = 60, height = 30, style = {} }) => 
 
       {/* Speed / Motion lines behind the car */}
       <g opacity="0.6">
-        <line x1="-15" y1="14" x2="5" y2="14" stroke={color} strokeWidth="1" strokeDasharray="3 3" filter={`url(#neon-glow-${color.replace('#', '')})`} />
-        <line x1="-25" y1="21" x2="3" y2="21" stroke={color} strokeWidth="1.2" strokeDasharray="6 3" filter={`url(#neon-glow-${color.replace('#', '')})`} />
-        <line x1="-10" y1="27" x2="8" y2="27" stroke={color} strokeWidth="0.8" strokeDasharray="2 4" filter={`url(#neon-glow-${color.replace('#', '')})`} />
+        <line x1="-20" y1="12" x2="5" y2="12" stroke={color} strokeWidth="1" strokeDasharray="3 3" filter={`url(#neon-glow-${color.replace('#', '')})`} />
+        <line x1="-30" y1="20" x2="3" y2="20" stroke={color} strokeWidth="1.5" strokeDasharray="8 4" filter={`url(#neon-glow-${color.replace('#', '')})`} />
+        <line x1="-15" y1="27" x2="8" y2="27" stroke={color} strokeWidth="0.8" strokeDasharray="4 4" filter={`url(#neon-glow-${color.replace('#', '')})`} />
       </g>
 
       {/* Underglow (neon halo underneath the car) */}
@@ -83,22 +83,18 @@ const CarIcon = ({ color = '#bc13fe', width = 60, height = 30, style = {} }) => 
 
       {/* Main Car Body Silhouette */}
       <path 
-        d="M 11 28 
-           L 11 20 
-           L 8 12 
-           L 17 12 
-           L 20 18 
-           L 42 16 
-           L 48 10 
-           L 65 10 
-           L 78 19 
-           L 92 23 
-           L 95 26 
-           L 90 28 
-           L 80 28 
-           A 8 8 0 0 0 64 28 
-           L 38 28 
-           A 8 8 0 0 0 22 28 
+        d="M 10 13
+           L 9 19
+           L 11 28
+           L 22 28
+           A 8 8 0 0 0 38 28
+           L 64 28
+           A 8 8 0 0 0 80 28
+           L 95 27
+           L 83 20
+           L 62 10
+           L 48 10
+           L 22 14
            Z"
         fill={`url(#body-grad-${color.replace('#', '')})`}
         stroke={color}
@@ -108,26 +104,40 @@ const CarIcon = ({ color = '#bc13fe', width = 60, height = 30, style = {} }) => 
 
       {/* Futuristic Cabin Window */}
       <path
-        d="M 50 12 L 64 12 L 74 19 L 45 19 Z"
-        fill="rgba(5, 5, 16, 0.9)"
+        d="M 47 12 
+           L 63 12 
+           L 74 18 
+           L 44 18 
+           Z"
+        fill="rgba(5, 5, 20, 0.95)"
         stroke={color}
         strokeWidth="1"
         opacity="0.9"
       />
-      <line x1="59" y1="12" x2="59" y2="19" stroke={color} strokeWidth="1" opacity="0.7" />
+      <line x1="58" y1="12" x2="58" y2="18" stroke={color} strokeWidth="1" opacity="0.7" />
 
-      {/* Aerodynamic side vent panel crease */}
+      {/* Cyberpunk triangular side intake vent */}
       <path
-        d="M 32 21 H 46 L 40 25"
+        d="M 44 18 L 36 21 L 43 25 Z"
+        fill="rgba(5, 5, 20, 0.95)"
+        stroke={color}
+        strokeWidth="0.8"
+        opacity="0.9"
+      />
+
+      {/* Aesthetic body and door creases */}
+      <path
+        d="M 63 12 L 59 21 L 44 21 L 43 27"
         fill="none"
         stroke={color}
-        strokeWidth="1"
-        opacity="0.8"
+        strokeWidth="0.8"
+        opacity="0.6"
       />
+      <line x1="38" y1="26.5" x2="64" y2="26.5" stroke={color} strokeWidth="1" opacity="0.8" />
 
       {/* Headlight */}
       <path 
-        d="M 88 22 L 93 24 L 89 25" 
+        d="M 87 21 L 93 23 L 89 24" 
         stroke="#ffffff" 
         strokeWidth="1.5" 
         fill="none"
@@ -135,35 +145,44 @@ const CarIcon = ({ color = '#bc13fe', width = 60, height = 30, style = {} }) => 
       />
 
       {/* Taillight */}
+      <path 
+        d="M 9.5 16 C 9 18, 9 20, 10.5 21" 
+        stroke="#ff1a1a" 
+        strokeWidth="2.2" 
+        fill="none"
+        filter={`url(#neon-glow-${color.replace('#', '')})`} 
+      />
+
+      {/* Wing Spoiler neon crease */}
       <line 
-        x1="11" y1="20" x2="11" y2="25" 
-        stroke="#ff3333" 
-        strokeWidth="2.5" 
+        x1="10" y1="13" x2="16" y2="13.5" 
+        stroke={color} 
+        strokeWidth="1.5" 
         filter={`url(#neon-glow-${color.replace('#', '')})`} 
       />
 
       {/* Wheels */}
       {/* Back Wheel */}
-      <circle cx="30" cy="28" r="7.5" fill="#050510" stroke={color} strokeWidth="1.5" filter={`url(#neon-glow-${color.replace('#', '')})`} />
-      <circle cx="30" cy="28" r="4.5" fill="#000" stroke="#fff" strokeWidth="0.8" />
+      <circle cx="30" cy="28" r="8" fill="#050510" stroke={color} strokeWidth="1.5" filter={`url(#neon-glow-${color.replace('#', '')})`} />
+      <circle cx="30" cy="28" r="5" fill="#000" stroke="#fff" strokeWidth="0.8" />
       {/* 8-Spoke Neon Rim Detail */}
       <g stroke={color} strokeWidth="0.8" opacity="0.9">
-        <line x1="26" y1="28" x2="34" y2="28" />
-        <line x1="30" y1="24" x2="30" y2="32" />
-        <line x1="27.2" y1="25.2" x2="32.8" y2="30.8" />
-        <line x1="27.2" y1="30.8" x2="32.8" y2="25.2" />
+        <line x1="25" y1="28" x2="35" y2="28" />
+        <line x1="30" y1="23" x2="30" y2="33" />
+        <line x1="26.5" y1="24.5" x2="33.5" y2="31.5" />
+        <line x1="26.5" y1="31.5" x2="33.5" y2="24.5" />
       </g>
       <circle cx="30" cy="28" r="1.5" fill="#fff" />
 
       {/* Front Wheel */}
-      <circle cx="72" cy="28" r="7.5" fill="#050510" stroke={color} strokeWidth="1.5" filter={`url(#neon-glow-${color.replace('#', '')})`} />
-      <circle cx="72" cy="28" r="4.5" fill="#000" stroke="#fff" strokeWidth="0.8" />
+      <circle cx="72" cy="28" r="8" fill="#050510" stroke={color} strokeWidth="1.5" filter={`url(#neon-glow-${color.replace('#', '')})`} />
+      <circle cx="72" cy="28" r="5" fill="#000" stroke="#fff" strokeWidth="0.8" />
       {/* 8-Spoke Neon Rim Detail */}
       <g stroke={color} strokeWidth="0.8" opacity="0.9">
-        <line x1="68" y1="28" x2="76" y2="28" />
-        <line x1="72" y1="24" x2="72" y2="32" />
-        <line x1="69.2" y1="25.2" x2="74.8" y2="30.8" />
-        <line x1="69.2" y1="30.8" x2="74.8" y2="25.2" />
+        <line x1="67" y1="28" x2="77" y2="28" />
+        <line x1="72" y1="23" x2="72" y2="33" />
+        <line x1="68.5" y1="24.5" x2="75.5" y2="31.5" />
+        <line x1="68.5" y1="31.5" x2="75.5" y2="24.5" />
       </g>
       <circle cx="72" cy="28" r="1.5" fill="#fff" />
     </svg>

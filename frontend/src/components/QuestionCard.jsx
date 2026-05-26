@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import TimerDisplay from './TimerDisplay';
-import HelpChoiceModal from './HelpChoiceModal';
 
 const QuestionCard = ({ question, onSubmitAnswer, onExpire, hasPendingHelpChoice, onHelpChoice }) => {
   const [answer, setAnswer] = useState('');
-  const [showHelpModal, setShowHelpModal] = useState(false);
+  const [skippedHelpQuestionId, setSkippedHelpQuestionId] = useState(null);
 
   if (!question) return <div className="glow-text-blue">טוען שאלה...</div>;
 
@@ -20,17 +19,6 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire, hasPendingHelpChoice
 
   return (
     <div className="question-container" style={{ position: 'relative' }}>
-      {hasPendingHelpChoice && (
-        <div style={{ position: 'absolute', top: '10px', left: '10px', zIndex: 10 }}>
-          <button 
-            className="option-btn hebrew-text" 
-            style={{ padding: '0.5rem 1rem', background: 'var(--neon-purple)', borderColor: 'var(--neon-purple)', boxShadow: '0 0 10px var(--neon-purple)' }}
-            onClick={() => setShowHelpModal(true)}
-          >
-            🆘 סיוע / Help
-          </button>
-        </div>
-      )}
       <div className="question-left-pane">
         <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
         
@@ -41,6 +29,33 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire, hasPendingHelpChoice
         {question.hintText && (
           <div className="hebrew-text" style={{ textAlign: 'center', marginBottom: '0.4rem', fontSize: 'clamp(0.9rem, 2.5vh, 1.2rem)', color: 'var(--neon-green)', textShadow: '0 0 10px var(--neon-green)' }}>
             💡 רמז: {question.hintText}
+          </div>
+        )}
+
+        {hasPendingHelpChoice && skippedHelpQuestionId !== question.questionId && (
+          <div className="help-pyramid-panel">
+            <div className="help-pyramid-top">
+              <button 
+                className="help-pyramid-button hint hebrew-text" 
+                onClick={() => onHelpChoice('HINT')}
+              >
+                💡 קבל רמז
+              </button>
+            </div>
+            <div className="help-pyramid-bottom">
+              <button 
+                className="help-pyramid-button replace hebrew-text" 
+                onClick={() => onHelpChoice('REPLACE')}
+              >
+                🔄 החלף שאלה
+              </button>
+              <button 
+                className="help-pyramid-button skip hebrew-text" 
+                onClick={() => setSkippedHelpQuestionId(question.questionId)}
+              >
+                ⏭ דלג על סיוע
+              </button>
+            </div>
           </div>
         )}
       </div>
@@ -69,17 +84,6 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire, hasPendingHelpChoice
           </form>
         )}
       </div>
-
-      {showHelpModal && (
-        <HelpChoiceModal 
-          isOpen={true} 
-          onChoice={(choice) => {
-            setShowHelpModal(false);
-            if (onHelpChoice) onHelpChoice(choice);
-          }} 
-          onSkip={() => setShowHelpModal(false)} 
-        />
-      )}
     </div>
   );
 };

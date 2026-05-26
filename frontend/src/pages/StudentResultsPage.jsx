@@ -36,6 +36,14 @@ const StudentResultsPage = () => {
         <h2 style={{ fontSize: '1.5rem', color: '#ccc', fontWeight: 'normal', margin: '0.5rem 0 0 0' }}>כל הכבוד לאלופים!</h2>
       </div>
 
+      <div className="student-results-finish-banner">
+        <div className="student-results-checkered-line"></div>
+        <div className="student-results-finish-glow hebrew-text">
+          🏁 סיום המרוץ 🏁
+        </div>
+        <div className="student-results-checkered-line"></div>
+      </div>
+
       <div className="results-page-container">
         
         {/* Left Pane - Podium */}

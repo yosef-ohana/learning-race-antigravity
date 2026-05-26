@@ -59,37 +59,54 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
     );
   }
 
-  // Original standard rendering (backward compatible)
+  // Student standard rendering — visually aligned with teacher dashboard
   return (
-    <div className="race-track-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%', padding: '0.6rem', borderRadius: '12px' }}>
+    <div className="student-track-list">
       {participantsPositions.map((p, idx) => {
-        const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100)); 
+        const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100));
         const isMe = p.id === currentUserId;
         const color = getParticipantColor(p, participantsPositions, idx);
-        
+        const rank = p.rank || idx + 1;
+
         return (
-          <div key={p.id} className={isMe ? 'lane-highlight' : ''} style={{ display: 'flex', alignItems: 'center', padding: '0.2rem 0.5rem', borderRadius: '8px' }}>
-            
-            <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1rem', color: color, textShadow: `0 0 10px ${color}`, marginRight: '1rem' }}>
-              {p.rank || idx + 1}
+          <div
+            key={p.id}
+            className={`student-track-row${isMe ? ' student-track-row--me' : ''}`}
+            style={{ borderLeft: `4px solid ${color}`, boxShadow: `inset 10px 0 20px -10px ${color}` }}
+          >
+            {/* Rank badge */}
+            <div className="student-track-rank" style={{ color: color, borderColor: color }}>
+              {rank}
             </div>
-            
-            <div style={{ width: '150px', fontSize: '1rem', fontWeight: isMe ? 'bold' : 'normal', color: isMe ? '#fff' : '#ccc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-              {p.displayName} {isMe ? '(אתה)' : ''}
+
+            {/* Name + "אתה" tag */}
+            <div className="student-track-info">
+              <div className="student-track-name">{p.displayName}</div>
+              {isMe && <div className="student-track-me-tag" style={{ color: color, borderColor: color }}>אתה</div>}
             </div>
-            
-            <div style={{ flex: 1, height: '12px', background: 'rgba(0,0,0,0.5)', borderRadius: '6px', margin: '0 1rem', position: 'relative', border: `1px solid rgba(255,255,255,0.1)` }}>
-              <div style={{ position: 'absolute', top: 0, left: 0, height: '100%', width: `${percent}%`, background: color, boxShadow: `0 0 15px ${color}`, borderRadius: '6px', transition: 'width 0.5s ease-out' }}></div>
-              
-              <div style={{ position: 'absolute', left: `calc(${percent}% - 20px)`, top: '50%', transform: 'translateY(-50%)', transition: 'left 0.5s ease-out', zIndex: 10 }}>
+
+            {/* Progress bar + car */}
+            <div className="student-track-bar-container">
+              <div className="student-track-bar-bg" />
+              <div
+                className="student-track-bar-fill"
+                style={{
+                  width: `${percent}%`,
+                  background: `linear-gradient(90deg, transparent, ${color})`,
+                  boxShadow: `5px 0 15px ${color}`
+                }}
+              />
+              <div className="student-track-car" style={{ left: `calc(${percent}% - 20px)` }}>
                 <CarIcon color={color} width={40} height={20} />
               </div>
+              {/* Finish line marker */}
+              <div className="student-track-finish-line" />
             </div>
-            
-            <div style={{ width: '80px', textAlign: 'right', fontSize: '1rem', color: '#fff', textShadow: `0 0 5px ${color}` }}>
+
+            {/* Points */}
+            <div className="student-track-points" style={{ color: color }}>
               {p.points} נק'
             </div>
-            
           </div>
         );
       })}
@@ -98,3 +115,4 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
 };
 
 export default RaceTrack;
+
