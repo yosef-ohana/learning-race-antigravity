@@ -60,8 +60,9 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
   }
 
   // Student standard rendering — visually aligned with teacher dashboard
+  const count = participantsPositions.length;
   return (
-    <div className="student-track-list">
+    <div className="student-track-list" style={{ '--participant-count': count }}>
       {participantsPositions.map((p, idx) => {
         const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100));
         const isMe = p.id === currentUserId;

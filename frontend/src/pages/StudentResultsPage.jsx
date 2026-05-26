@@ -33,13 +33,13 @@ const StudentResultsPage = () => {
       
       <div style={{ textAlign: 'center', margin: '2rem 0 0 0' }} className="hebrew-text">
         <h1 style={{ fontSize: '4rem', color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)', textTransform: 'uppercase', margin: 0 }}>המרוץ הסתיים!</h1>
-        <h2 style={{ fontSize: '1.5rem', color: '#ccc', fontWeight: 'normal', margin: '0.5rem 0 0 0' }}>כל הכבוד לאלופים!</h2>
+        <h2 style={{ fontSize: '1.5rem', color: '#ccc', fontWeight: 'normal', margin: '0.5rem 0 0 0' }}>כל הכבוד למתחרים!</h2>
       </div>
 
       <div className="student-results-finish-banner">
         <div className="student-results-checkered-line"></div>
         <div className="student-results-finish-glow hebrew-text">
-          🏁 סיום המרוץ 🏁
+          🏁 המירוץ הסתיים 🏁
         </div>
         <div className="student-results-checkered-line"></div>
       </div>

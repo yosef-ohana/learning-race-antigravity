@@ -258,9 +258,16 @@ public class GameplayController {
         q.setIsAnswered(true);
         q.setAnsweredAt(now);
         
-        boolean correct = q.getCorrectOptionId() != null && q.getCorrectOptionId().equals(selectedOptionId);
+        boolean isTimeout = (selectedOptionId != null && selectedOptionId == -1) 
+            || (q.getExpiresAt() != null && now >= q.getExpiresAt());
+        
+        boolean correct = !isTimeout && q.getCorrectOptionId() != null && q.getCorrectOptionId().equals(selectedOptionId);
         q.setWasCorrect(correct);
-        q.setStatus(correct ? "ANSWERED_CORRECTLY" : "ANSWERED_WRONGLY");
+        if (isTimeout) {
+            q.setStatus("TIMEOUT");
+        } else {
+            q.setStatus(correct ? "ANSWERED_CORRECTLY" : "ANSWERED_WRONGLY");
+        }
         persist.update(q);
 
         GameplayActionResponse res = new GameplayActionResponse(true, "Answer processed");

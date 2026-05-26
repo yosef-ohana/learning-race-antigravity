@@ -157,10 +157,17 @@ const StudentRacePage = () => {
     if (isAnswering) return; // Prevent double submit
     if (state?.playerState?.status === 'FROZEN') return; // Do not allow answering during FROZEN
     setIsAnswering(true);
+    const isTimeout = answer === '' || answer === -1 || answer === '-1';
     try {
       const res = await submitAnswer(raceId, question?.questionId || '', answer);
       if (res.data.success) {
-        setEvent(res.data.isCorrect ? 'תשובה נכונה!' : 'תשובה שגויה!');
+        if (res.data.isCorrect) {
+          setEvent('תשובה נכונה!');
+        } else if (isTimeout) {
+          setEvent('⏰ נגמר הזמן!');
+        } else {
+          setEvent('תשובה שגויה!');
+        }
         setQuestion(null);
         fetchStateAndQuestion();
         
@@ -224,7 +231,7 @@ const StudentRacePage = () => {
           </div>
         </div>
         
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
           <RaceTrack participantsPositions={state.participantsPositions} currentUserId={state.playerState.id} />
         </div>
       </div>
@@ -243,7 +250,9 @@ const StudentRacePage = () => {
         {event && (
           <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90 }}>
             <div className={`student-feedback-card ${event.includes('נכונה') ? 'success' : 'error'}`}>
-              <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>{event.includes('נכונה') ? '🎉' : '💥'}</div>
+              <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>
+                {event.includes('נכונה') ? '🎉' : event.includes('זמן') ? '⏰' : '💥'}
+              </div>
               <h1 style={{ fontSize: '2.2rem', margin: 0 }}>{event}</h1>
             </div>
           </div>
