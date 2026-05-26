@@ -31,7 +31,7 @@ const StudentResultsPage = () => {
   return (
     <div className="student-layout" style={{ overflowY: 'auto' }}>
       
-      <div style={{ textAlign: 'center', margin: '2rem 0 0 0' }}>
+      <div style={{ textAlign: 'center', margin: '2rem 0 0 0' }} className="hebrew-text">
         <h1 style={{ fontSize: '4rem', color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)', textTransform: 'uppercase', margin: 0 }}>המרוץ הסתיים!</h1>
         <h2 style={{ fontSize: '1.5rem', color: '#ccc', fontWeight: 'normal', margin: '0.5rem 0 0 0' }}>כל הכבוד לאלופים!</h2>
       </div>
@@ -43,42 +43,68 @@ const StudentResultsPage = () => {
           
           <div className="podium-container">
             {podium[1] && (
-              <div className="podium-block podium-rank-2">
-                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: 'var(--neon-purple)', textShadow: '0 0 15px var(--neon-purple)', marginBottom: '1rem' }}>2</div>
+              <div className="podium-column">
+                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: 'var(--neon-purple)', textShadow: '0 0 15px var(--neon-purple)', marginBottom: '0.4rem' }} className="bidi-isolate">2</div>
                 
-                <CarIcon color={getParticipantColor(podium[1], results.leaderboard, 1)} width={60} height={30} />
+                <div style={{ marginBottom: '-6px', zIndex: 10 }}>
+                  <CarIcon color={getParticipantColor(podium[1], results.leaderboard, 1)} width={60} height={30} />
+                </div>
 
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '1rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{podium[1].displayName}{podium[1].isCurrentUser ? ' — אתה' : ''}</div>
-                <div style={{ fontSize: '1.2rem', color: 'var(--neon-purple)' }}>{podium[1].points} נק'</div>
+                <div className="podium-pedestal pedestal-2">
+                  <div style={{ fontSize: '1.2rem', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', marginBottom: '0.3rem' }} className="hebrew-text">
+                    {podium[1].displayName}{podium[1].isCurrentUser ? ' (אתה)' : ''}
+                  </div>
+                  <div style={{ fontSize: '1.1rem', color: 'var(--neon-purple)', fontWeight: 'bold', marginBottom: '0.8rem' }} className="hebrew-text">
+                    {podium[1].points} נק'
+                  </div>
+                  <div style={{ fontSize: '1.8rem' }}>🥈</div>
+                </div>
               </div>
             )}
             
             {podium[0] && (
-              <div className="podium-block podium-rank-1">
-                <div style={{ fontSize: '4rem', fontWeight: 'bold', color: 'var(--neon-orange)', textShadow: '0 0 15px var(--neon-orange)', marginBottom: '1rem' }}>1</div>
+              <div className="podium-column">
+                <div style={{ fontSize: '4.2rem', fontWeight: 'bold', color: 'var(--neon-orange)', textShadow: '0 0 18px var(--neon-orange)', marginBottom: '0.4rem' }} className="bidi-isolate">1</div>
                 
-                <CarIcon color={getParticipantColor(podium[0], results.leaderboard, 0)} width={70} height={35} />
+                <div style={{ marginBottom: '-8px', zIndex: 10 }}>
+                  <CarIcon color={getParticipantColor(podium[0], results.leaderboard, 0)} width={75} height={38} />
+                </div>
 
-                <div style={{ fontSize: '1.8rem', fontWeight: 'bold', marginTop: '1rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{podium[0].displayName}{podium[0].isCurrentUser ? ' — אתה' : ''}</div>
-                <div style={{ fontSize: '1.5rem', color: 'var(--neon-orange)', fontWeight: 'bold' }}>{podium[0].points} נק'</div>
-                <div style={{ fontSize: '2rem', marginTop: '0.5rem' }}>🏆</div>
+                <div className="podium-pedestal pedestal-1">
+                  <div style={{ fontSize: '1.4rem', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', marginBottom: '0.3rem' }} className="hebrew-text">
+                    {podium[0].displayName}{podium[0].isCurrentUser ? ' (אתה)' : ''}
+                  </div>
+                  <div style={{ fontSize: '1.2rem', color: 'var(--neon-orange)', fontWeight: 'bold', marginBottom: '0.8rem' }} className="hebrew-text">
+                    {podium[0].points} נק'
+                  </div>
+                  <div style={{ fontSize: '2.2rem' }}>🏆</div>
+                </div>
               </div>
             )}
 
             {podium[2] && (
-              <div className="podium-block podium-rank-3">
-                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: 'var(--neon-blue)', textShadow: '0 0 15px var(--neon-blue)', marginBottom: '1rem' }}>3</div>
+              <div className="podium-column">
+                <div style={{ fontSize: '3rem', fontWeight: 'bold', color: 'var(--neon-blue)', textShadow: '0 0 15px var(--neon-blue)', marginBottom: '0.4rem' }} className="bidi-isolate">3</div>
                 
-                <CarIcon color={getParticipantColor(podium[2], results.leaderboard, 2)} width={60} height={30} />
+                <div style={{ marginBottom: '-6px', zIndex: 10 }}>
+                  <CarIcon color={getParticipantColor(podium[2], results.leaderboard, 2)} width={60} height={30} />
+                </div>
 
-                <div style={{ fontSize: '1.5rem', fontWeight: 'bold', marginTop: '1rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>{podium[2].displayName}{podium[2].isCurrentUser ? ' — אתה' : ''}</div>
-                <div style={{ fontSize: '1.2rem', color: 'var(--neon-blue)' }}>{podium[2].points} נק'</div>
+                <div className="podium-pedestal pedestal-3">
+                  <div style={{ fontSize: '1.1rem', fontWeight: 'bold', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%', marginBottom: '0.3rem' }} className="hebrew-text">
+                    {podium[2].displayName}{podium[2].isCurrentUser ? ' (אתה)' : ''}
+                  </div>
+                  <div style={{ fontSize: '1rem', color: 'var(--neon-blue)', fontWeight: 'bold', marginBottom: '0.6rem' }} className="hebrew-text">
+                    {podium[2].points} נק'
+                  </div>
+                  <div style={{ fontSize: '1.6rem' }}>🥉</div>
+                </div>
               </div>
             )}
           </div>
 
           <div style={{ marginTop: 'auto', display: 'flex', gap: '1rem' }}>
-            <button className="option-btn" style={{ flex: 1, padding: '1rem', fontSize: '1.2rem', border: '2px solid var(--neon-purple)', color: 'var(--neon-purple)', boxShadow: 'none' }} onClick={() => {
+            <button className="option-btn hebrew-text" style={{ flex: 1, padding: '1rem', fontSize: '1.2rem', border: '2px solid var(--neon-purple)', color: 'var(--neon-purple)', boxShadow: 'none' }} onClick={() => {
               Cookies.remove(COOKIE_STUDENT_TOKEN);
               Cookies.remove(COOKIE_RACE_ID);
               navigate(ROUTES.STUDENT_JOIN);
@@ -90,7 +116,7 @@ const StudentResultsPage = () => {
 
         {/* Right Pane - Leaderboard */}
         <div className="results-right-pane">
-          <div style={{ fontSize: '1.5rem', color: 'var(--neon-blue)', marginBottom: '1.5rem', borderBottom: '1px solid rgba(0, 243, 255, 0.3)', paddingBottom: '0.8rem', textAlign: 'center' }}>
+          <div style={{ fontSize: '1.5rem', color: 'var(--neon-blue)', marginBottom: '1.5rem', borderBottom: '1px solid rgba(0, 243, 255, 0.3)', paddingBottom: '0.8rem', textAlign: 'center' }} className="hebrew-text">
             טבלת דירוג סופית
           </div>
           <Leaderboard leaderboard={results.leaderboard} variant="cyberpunk" />

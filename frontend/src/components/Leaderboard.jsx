@@ -52,16 +52,20 @@ const Leaderboard = ({ leaderboard, variant = 'standard' }) => {
           const color = getParticipantColor(entry, leaderboard, idx);
           
           return (
-            <div key={entry.userId || entry.id} className="leaderboard-row">
+            <div key={entry.userId || entry.id} className="leaderboard-row" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
               <div className="leaderboard-badge" style={{ border: `2px solid ${color}`, color: color, textShadow: `0 0 10px ${color}`, boxShadow: `inset 0 0 10px ${color}` }}>
                 {rank}
               </div>
               
-              <div style={{ flex: 1, fontSize: '1.5rem', fontWeight: 'bold', color: '#fff' }}>
-                {entry.displayName}{entry.isCurrentUser ? ' — אתה' : ''}
+              <div style={{ display: 'flex', alignItems: 'center', width: '55px' }}>
+                <CarIcon color={color} width={50} height={25} />
               </div>
               
-              <div style={{ fontSize: '1.5rem', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)', fontWeight: 'bold' }}>
+              <div style={{ flex: 1, fontSize: '1.2rem', fontWeight: 'bold', color: '#fff' }} className="hebrew-text">
+                {entry.displayName}{entry.isCurrentUser ? ' (אתה)' : ''}
+              </div>
+              
+              <div style={{ fontSize: '1.3rem', color: color, textShadow: `0 0 10px ${color}`, fontWeight: 'bold' }} className="hebrew-text">
                 {entry.points} נק'
               </div>
             </div>

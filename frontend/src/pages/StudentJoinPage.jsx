@@ -42,7 +42,7 @@ const StudentJoinPage = () => {
       <div className="join-page-bg"></div>
       
       <div className="join-header">
-        <h1 className="join-title">
+        <h1 className="join-title bidi-isolate" style={{ direction: 'ltr' }}>
           Math Race
           <div className="checkered-flag-icon">
             <div/><div/><div/>
@@ -50,15 +50,15 @@ const StudentJoinPage = () => {
             <div/><div/><div/>
           </div>
         </h1>
-        <div className="join-subtitle">מרוץ חשבון חווייתי בזמן אמת</div>
+        <div className="join-subtitle hebrew-text">מרוץ חשבון חווייתי בזמן אמת</div>
       </div>
 
-      <div className="join-card">
+      <div className="join-card hebrew-text">
         <h2>הצטרפות למירוץ</h2>
         <p>היכנסו, הצטרפו לחדר והתחילו לשחק!</p>
         
         {error && (
-          <div className="glow-card-danger" style={{ 
+          <div className="glow-card-danger hebrew-text" style={{ 
             marginBottom: '1.5rem', 
             color: '#ffaa00', 
             border: '1px solid #ffaa00', 
@@ -74,7 +74,7 @@ const StudentJoinPage = () => {
           <div className="join-input-group">
             <input 
               type="text" 
-              className="join-input"
+              className="join-input hebrew-text"
               value={displayName} 
               onChange={e => setDisplayName(e.target.value)} 
               placeholder="שם תלמיד" 
@@ -90,7 +90,7 @@ const StudentJoinPage = () => {
           <div className="join-input-group">
             <input 
               type="text" 
-              className="join-input"
+              className="join-input hebrew-text"
               value={raceCode} 
               onChange={e => setRaceCode(e.target.value)} 
               placeholder="קוד חדר" 
@@ -102,10 +102,10 @@ const StudentJoinPage = () => {
             </svg>
           </div>
 
-          <button type="submit" className="join-btn" disabled={isLoading}>
-            <span style={{ fontSize: '1.2rem', opacity: 0.8 }}>&lt;&lt;</span>
+          <button type="submit" className="join-btn hebrew-text" disabled={isLoading}>
+            <span style={{ fontSize: '1.2rem', opacity: 0.8 }} className="bidi-isolate">&lt;&lt;</span>
             <span>{isLoading ? 'מתחבר...' : 'הצטרפות למירוץ'}</span>
-            <span style={{ fontSize: '1.2rem', opacity: 0.8 }}>&gt;&gt;</span>
+            <span style={{ fontSize: '1.2rem', opacity: 0.8 }} className="bidi-isolate">&gt;&gt;</span>
           </button>
         </form>
       </div>

@@ -150,7 +150,6 @@ const TeacherRaceDashboardPage = () => {
       </div>
 
       <div className="dashboard-main-content">
-        <div className="track-finish-line-pattern"></div>
         <RaceTrack participantsPositions={snapshot.participantsPositions} currentUserId={null} variant="dashboard" />
       </div>
 

@@ -9,6 +9,7 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
 
     return (
       <div className="dashboard-track-list">
+        <div className="track-finish-line-pattern"></div>
         {participantsPositions.map((p, idx) => {
           const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100));
           const rank = p.rank || idx + 1;
@@ -60,20 +61,20 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
 
   // Original standard rendering (backward compatible)
   return (
-    <div className="race-track-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', width: '100%', padding: '1rem', borderRadius: '12px' }}>
+    <div className="race-track-container" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', width: '100%', padding: '0.6rem', borderRadius: '12px' }}>
       {participantsPositions.map((p, idx) => {
         const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100)); 
         const isMe = p.id === currentUserId;
         const color = getParticipantColor(p, participantsPositions, idx);
         
         return (
-          <div key={p.id} className={isMe ? 'lane-highlight' : ''} style={{ display: 'flex', alignItems: 'center', padding: '0.5rem', borderRadius: '8px' }}>
+          <div key={p.id} className={isMe ? 'lane-highlight' : ''} style={{ display: 'flex', alignItems: 'center', padding: '0.2rem 0.5rem', borderRadius: '8px' }}>
             
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1.2rem', color: color, textShadow: `0 0 10px ${color}`, marginRight: '1rem' }}>
+            <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: `2px solid ${color}`, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', fontSize: '1rem', color: color, textShadow: `0 0 10px ${color}`, marginRight: '1rem' }}>
               {p.rank || idx + 1}
             </div>
             
-            <div style={{ width: '150px', fontSize: '1.2rem', fontWeight: isMe ? 'bold' : 'normal', color: isMe ? '#fff' : '#ccc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            <div style={{ width: '150px', fontSize: '1rem', fontWeight: isMe ? 'bold' : 'normal', color: isMe ? '#fff' : '#ccc', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {p.displayName} {isMe ? '(אתה)' : ''}
             </div>
             
@@ -85,7 +86,7 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
               </div>
             </div>
             
-            <div style={{ width: '80px', textAlign: 'right', fontSize: '1.2rem', color: '#fff', textShadow: `0 0 5px ${color}` }}>
+            <div style={{ width: '80px', textAlign: 'right', fontSize: '1rem', color: '#fff', textShadow: `0 0 5px ${color}` }}>
               {p.points} נק'
             </div>
             

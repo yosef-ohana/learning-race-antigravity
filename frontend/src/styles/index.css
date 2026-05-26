@@ -89,47 +89,42 @@ body {
 .student-layout {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  height: 100dvh;
-  overflow: hidden;
+  min-height: 100vh;
+  min-height: 100dvh;
+  overflow-y: auto;
   background: var(--bg-dark);
   color: white;
   font-family: var(--font-main);
 }
 .student-top {
   flex: 0 0 auto;
-  max-height: 28vh;
-  min-height: 120px;
   display: flex;
   flex-direction: column;
   padding: 0.8rem;
   border-bottom: 2px solid var(--neon-purple);
   box-shadow: 0 5px 15px rgba(188,19,254,0.3);
-  overflow-y: auto;
 }
 .student-bottom {
-  flex: 1 1 auto;
+  flex: 1 0 auto;
   padding: 1rem;
   display: flex;
   flex-direction: column;
   position: relative;
-  overflow-y: auto;
   min-height: 320px;
 }
 
 .options-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: clamp(0.5rem, 1.5vh, 1.2rem);
+  grid-gap: 0.8rem;
   margin-top: 0.5rem;
-  flex: 1;
 }
 .option-btn {
   background: rgba(0, 0, 0, 0.7); border: 2px solid var(--neon-blue); color: var(--neon-blue);
-  font-family: var(--font-main); font-size: clamp(1rem, 2.8vh, 1.8rem); font-weight: bold; text-transform: uppercase; border-radius: 12px;
+  font-family: var(--font-main); font-size: clamp(0.9rem, 2vh, 1.4rem); font-weight: bold; text-transform: uppercase; border-radius: 12px;
   cursor: pointer; transition: all 0.2s ease; box-shadow: inset 0 0 10px rgba(0,243,255,0.2), 0 0 10px rgba(0,243,255,0.4);
-  display: flex; align-items: center; justify-content: center; padding: clamp(0.5rem, 1.5vh, 1.2rem);
-  min-height: clamp(45px, 7vh, 80px);
+  display: flex; align-items: center; justify-content: center; padding: 0.6rem 1rem;
+  min-height: 50px;
 }
 .option-btn:hover { background: rgba(0, 243, 255, 0.15); color: #fff; box-shadow: 0 0 30px var(--neon-blue); border-color: #fff; }
 
@@ -273,42 +268,51 @@ body {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 1rem;
+  gap: 1.5rem;
   margin-top: auto;
   margin-bottom: 2rem;
-  height: 300px;
+  height: 380px;
 }
-.podium-block {
+.podium-column {
   display: flex;
   flex-direction: column;
   align-items: center;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  padding: 1rem;
+  position: relative;
 }
-.podium-rank-1 {
-  width: 140px;
-  height: 250px;
-  background: linear-gradient(to top, rgba(255,170,0,0.2), rgba(255,170,0,0.05));
-  border: 2px solid var(--neon-orange);
-  border-bottom: none;
-  box-shadow: 0 -10px 30px rgba(255,170,0,0.4);
+.podium-pedestal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.2rem 0.8rem;
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  text-align: center;
+  box-sizing: border-box;
 }
-.podium-rank-2 {
+.pedestal-2 {
   width: 130px;
-  height: 200px;
-  background: linear-gradient(to top, rgba(188,19,254,0.2), rgba(188,19,254,0.05));
+  height: 180px;
+  background: linear-gradient(to top, rgba(188,19,254,0.15) 0%, rgba(188,19,254,0.02) 100%);
   border: 2px solid var(--neon-purple);
   border-bottom: none;
-  box-shadow: 0 -10px 20px rgba(188,19,254,0.4);
+  box-shadow: 0 -8px 25px rgba(188,19,254,0.25);
 }
-.podium-rank-3 {
+.pedestal-1 {
+  width: 145px;
+  height: 220px;
+  background: linear-gradient(to top, rgba(255,170,0,0.18) 0%, rgba(255,170,0,0.02) 100%);
+  border: 2px solid var(--neon-orange);
+  border-bottom: none;
+  box-shadow: 0 -8px 30px rgba(255,170,0,0.35);
+}
+.pedestal-3 {
   width: 120px;
-  height: 150px;
-  background: linear-gradient(to top, rgba(0,243,255,0.2), rgba(0,243,255,0.05));
+  height: 140px;
+  background: linear-gradient(to top, rgba(0,243,255,0.15) 0%, rgba(0,243,255,0.02) 100%);
   border: 2px solid var(--neon-blue);
   border-bottom: none;
-  box-shadow: 0 -10px 20px rgba(0,243,255,0.4);
+  box-shadow: 0 -8px 25px rgba(0,243,255,0.25);
 }
 
 /* Leaderboard Overhaul */
@@ -917,7 +921,7 @@ body {
 .track-finish-line-pattern {
   width: 30px;
   position: absolute;
-  right: 1.5rem;
+  right: -1.5rem;
   top: 0;
   bottom: 0;
   background: repeating-linear-gradient(
@@ -942,6 +946,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  position: relative;
 }
 
 .dashboard-track-row {
@@ -1522,3 +1527,188 @@ body {
   font-size: 1.5rem;
   font-weight: bold;
 }
+
+/* RTL & Hebrew Text Helpers for Batch 1A */
+.hebrew-text {
+  direction: rtl;
+  text-align: right;
+  unicode-bidi: isolate;
+}
+
+.rtl-text {
+  direction: rtl;
+  unicode-bidi: isolate;
+}
+
+.mixed-text {
+  direction: rtl;
+  unicode-bidi: plaintext;
+}
+
+.bidi-isolate {
+  unicode-bidi: isolate;
+  display: inline-block;
+}
+
+/* --- PATH CHOICE MODAL BATCH 6A --- */
+.modal-content:has(.path-choice-panel) {
+  width: 750px !important;
+  max-width: 95% !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.path-choice-panel {
+  background: rgba(5, 5, 20, 0.95);
+  border: 2px solid var(--neon-purple);
+  box-shadow: 0 0 40px rgba(188, 19, 254, 0.35);
+  border-radius: 20px;
+  padding: 2rem 2.5rem;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.path-choice-panel::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 4px;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple), var(--neon-orange));
+}
+
+.path-choice-title {
+  font-size: 3rem;
+  font-weight: bold;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+  letter-spacing: 2px;
+}
+
+.path-choice-subtitle {
+  font-size: 1.3rem;
+  color: #aaa;
+  margin: 0.5rem 0 2rem 0;
+}
+
+.path-choice-grid {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .path-choice-grid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
+.path-choice-card {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  box-sizing: border-box;
+  font-family: var(--font-main);
+}
+
+/* Highway (Blue/Cyan Neon Theme) */
+.path-choice-card.highway {
+  border: 2px solid var(--neon-blue);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.15), inset 0 0 10px rgba(0, 243, 255, 0.05);
+}
+
+.path-choice-card.highway:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 0 35px rgba(0, 243, 255, 0.65), inset 0 0 15px rgba(0, 243, 255, 0.25);
+  background: rgba(0, 243, 255, 0.08);
+}
+
+.path-choice-card.highway .path-card-title {
+  color: var(--neon-blue);
+  text-shadow: 0 0 12px var(--neon-blue);
+}
+
+/* Dirt Road (Orange/Yellow Neon Theme) */
+.path-choice-card.dirt-road {
+  border: 2px solid var(--neon-orange);
+  box-shadow: 0 0 15px rgba(255, 170, 0, 0.15), inset 0 0 10px rgba(255, 170, 0, 0.05);
+}
+
+.path-choice-card.dirt-road:hover {
+  transform: translateY(-8px) scale(1.03);
+  box-shadow: 0 0 35px rgba(255, 170, 0, 0.65), inset 0 0 15px rgba(255, 170, 0, 0.25);
+  background: rgba(255, 170, 0, 0.08);
+}
+
+.path-choice-card.dirt-road .path-card-title {
+  color: var(--neon-orange);
+  text-shadow: 0 0 12px var(--neon-orange);
+}
+
+.path-card-title {
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin: 0;
+}
+
+.path-card-subtitle {
+  font-size: 1rem;
+  color: #888;
+  margin-top: -0.5rem;
+}
+
+.path-card-divider {
+  width: 50%;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+  margin: 0.5rem 0;
+}
+
+.path-card-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  color: #e0e0e0;
+}
+
+.path-card-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.path-card-badge.highway-badge {
+  border: 1px solid rgba(0, 243, 255, 0.3);
+  color: var(--neon-blue);
+  background: rgba(0, 243, 255, 0.1);
+}
+
+.path-card-badge.dirt-badge {
+  border: 1px solid rgba(255, 170, 0, 0.3);
+  color: var(--neon-orange);
+  background: rgba(255, 170, 0, 0.1);
+}
+
+

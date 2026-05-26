@@ -213,7 +213,7 @@ public class GameplayController {
         qr.expiresAt = activeQ.getExpiresAt();
         qr.hintAvailable = checkIsBehind(raceId, participant.getPosition() != null ? participant.getPosition() : 0);
         if ("HINT".equals(activeQ.getHelpUsed())) {
-            qr.hintText = "Hint applied."; // basic hint
+            qr.hintText = "קרא את השאלה לאט, סמן את הנתונים החשובים ובדוק איזו פעולה מתמטית נדרשת."; // basic hint
         }
         qr.helpUsed = activeQ.getHelpUsed();
         return qr;
@@ -349,6 +349,10 @@ public class GameplayController {
             activeQ.setStatus("TIMEOUT");
             persist.update(activeQ);
             
+            participant.setConsecutiveWrongCount(0);
+            participant.setConsecutiveNoProgressCount(0);
+            persist.update(participant);
+            
             List<RaceQuestionEntity> existingQs = persist.executeQuery(
                 "from RaceQuestionEntity where participantId = :pid",
                 Map.of("pid", participant.getId()), RaceQuestionEntity.class);
@@ -373,7 +377,7 @@ public class GameplayController {
         qr.branchType = activeQ.getBranchType();
         qr.expiresAt = activeQ.getExpiresAt();
         if ("HINT".equals(helpType)) {
-            qr.hintText = "Hint applied.";
+            qr.hintText = "קרא את השאלה לאט, סמן את הנתונים החשובים ובדוק איזו פעולה מתמטית נדרשת.";
         }
         qr.helpUsed = activeQ.getHelpUsed();
         return qr;
