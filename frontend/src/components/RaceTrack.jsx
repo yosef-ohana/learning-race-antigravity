@@ -6,9 +6,10 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
   if (!participantsPositions || participantsPositions.length === 0) return null;
 
   if (variant === 'dashboard') {
+    const count = participantsPositions.length;
 
     return (
-      <div className="dashboard-track-list">
+      <div className="dashboard-track-list" style={{ '--participant-count': count }}>
         <div className="track-finish-line-pattern"></div>
         {participantsPositions.map((p, idx) => {
           const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100));

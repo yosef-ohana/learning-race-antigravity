@@ -29,11 +29,11 @@ const StudentResultsPage = () => {
   const podium = results.leaderboard ? results.leaderboard.slice(0, 3) : [];
 
   return (
-    <div className="student-layout" style={{ overflowY: 'auto' }}>
+    <div className="student-layout" style={{ overflow: 'hidden' }}>
       
-      <div style={{ textAlign: 'center', margin: '2rem 0 0 0' }} className="hebrew-text">
-        <h1 style={{ fontSize: '4rem', color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)', textTransform: 'uppercase', margin: 0 }}>המרוץ הסתיים!</h1>
-        <h2 style={{ fontSize: '1.5rem', color: '#ccc', fontWeight: 'normal', margin: '0.5rem 0 0 0' }}>כל הכבוד למתחרים!</h2>
+      <div style={{ textAlign: 'center', margin: 'clamp(0.5rem, 3vh, 1.5rem) 0 0 0' }} className="hebrew-text">
+        <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3.5rem)', color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)', textTransform: 'uppercase', margin: 0 }}>המרוץ הסתיים!</h1>
+        <h2 style={{ fontSize: 'clamp(0.9rem, 2.2vh, 1.3rem)', color: '#ccc', fontWeight: 'normal', margin: '0.2rem 0 0 0' }}>כל הכבוד למתחרים!</h2>
       </div>
 
       <div className="student-results-finish-banner">
@@ -111,8 +111,8 @@ const StudentResultsPage = () => {
             )}
           </div>
 
-          <div style={{ marginTop: 'auto', display: 'flex', gap: '1rem' }}>
-            <button className="option-btn hebrew-text" style={{ flex: 1, padding: '1rem', fontSize: '1.2rem', border: '2px solid var(--neon-purple)', color: 'var(--neon-purple)', boxShadow: 'none' }} onClick={() => {
+          <div style={{ marginTop: 'clamp(0.5rem, 2vh, 1.5rem)', display: 'flex', gap: '1rem' }}>
+            <button className="option-btn hebrew-text" style={{ flex: 1, padding: 'clamp(0.5rem, 1.5vh, 1rem)', fontSize: 'clamp(0.9rem, 2.2vh, 1.2rem)', border: '2px solid var(--neon-purple)', color: 'var(--neon-purple)', boxShadow: 'none' }} onClick={() => {
               Cookies.remove(COOKIE_STUDENT_TOKEN);
               Cookies.remove(COOKIE_RACE_ID);
               navigate(ROUTES.STUDENT_JOIN);
@@ -124,7 +124,7 @@ const StudentResultsPage = () => {
 
         {/* Right Pane - Leaderboard */}
         <div className="results-right-pane">
-          <div style={{ fontSize: '1.5rem', color: 'var(--neon-blue)', marginBottom: '1.5rem', borderBottom: '1px solid rgba(0, 243, 255, 0.3)', paddingBottom: '0.8rem', textAlign: 'center' }} className="hebrew-text">
+          <div style={{ fontSize: 'clamp(1.1rem, 2.5vh, 1.5rem)', color: 'var(--neon-blue)', marginBottom: 'clamp(0.5rem, 1.5vh, 1rem)', borderBottom: '1px solid rgba(0, 243, 255, 0.3)', paddingBottom: 'clamp(0.3rem, 1vh, 0.8rem)', textAlign: 'center' }} className="hebrew-text">
             טבלת דירוג סופית
           </div>
           <Leaderboard leaderboard={results.leaderboard} variant="cyberpunk" />

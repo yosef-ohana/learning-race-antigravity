@@ -21,15 +21,19 @@ const StudentRacePage = () => {
   const prevMultiplierRef = useRef(1);
   const luckTimeoutRef = useRef(null);
   const eventTimeoutRef = useRef(null);
+  const fetchSequenceRef = useRef(0);
   const navigate = useNavigate();
 
   const token = Cookies.get(COOKIE_STUDENT_TOKEN);
   const activeLuckMultiplier = Number(state?.playerState?.activeLuckMultiplier || 1);
 
   const fetchStateAndQuestion = async () => {
+    const currentSeq = ++fetchSequenceRef.current;
     try {
       const stateRes = await fetchStudentRaceState(raceId);
-      const newState = stateRes.data;
+      if (currentSeq !== fetchSequenceRef.current) return;
+      
+      let newState = stateRes.data;
       setState(newState);
 
       if (newState.raceStatus === 'FINISHED' || (newState.playerState && newState.playerState.raceFinished)) {
@@ -39,9 +43,22 @@ const StudentRacePage = () => {
 
       if (newState.canPlay && !newState.playerState.hasPendingDecision && newState.playerState.status !== 'FROZEN') {
         const qRes = await fetchCurrentQuestion(raceId);
+        if (currentSeq !== fetchSequenceRef.current) return;
+        
         if (qRes.data) {
           setQuestion(qRes.data);
         } else {
+          const recoveryRes = await fetchStudentRaceState(raceId);
+          if (currentSeq !== fetchSequenceRef.current) return;
+          
+          newState = recoveryRes.data;
+          setState(newState);
+          
+          if (newState.raceStatus === 'FINISHED' || (newState.playerState && newState.playerState.raceFinished)) {
+            navigate(ROUTES.STUDENT_RESULTS(raceId));
+            return;
+          }
+          
           setQuestion(null);
         }
       } else {

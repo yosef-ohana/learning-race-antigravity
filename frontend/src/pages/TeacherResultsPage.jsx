@@ -16,9 +16,9 @@ const PodiumItem = ({ place, data, leaderboard }) => {
     3: 'var(--neon-blue)' 
   };
   const color = colors[place] || 'var(--neon-blue)';
-  const height = place === 1 ? '260px' : '220px';
-  const width = place === 1 ? '240px' : '220px';
-  const marginTop = place === 1 ? '0' : '40px';
+  const height = place === 1 ? 'clamp(150px, 28vh, 260px)' : 'clamp(130px, 24vh, 220px)';
+  const width = place === 1 ? 'clamp(180px, 20vw, 240px)' : 'clamp(160px, 18vw, 220px)';
+  const marginTop = place === 1 ? '0' : 'clamp(15px, 4vh, 40px)';
 
   return (
     <div className={`t-podium-item place-${place}`} style={{ width, height, marginTop, borderColor: color, boxShadow: `0 0 20px ${color}33, inset 0 0 20px ${color}33` }}>
@@ -65,11 +65,11 @@ const TeacherResultsPage = () => {
   const third = sortedLeaderboard[2];
 
   return (
-    <div className="dashboard-container" style={{ direction: 'rtl', overflowY: 'auto' }}>
+    <div className="dashboard-container t-results-page" style={{ direction: 'rtl', overflow: 'hidden' }}>
       <div className="join-page-bg"></div>
 
       {/* TOP HEADER */}
-      <div className="dashboard-header" style={{ position: 'fixed', top: 0, left: 0, right: 0, borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)', zIndex: 20 }}>
+      <div className="dashboard-header" style={{ position: 'relative', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)' }}>
         
         {/* Right Action (Back to lobby equivalent) */}
         <div className="dashboard-actions">
