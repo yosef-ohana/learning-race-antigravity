@@ -29,7 +29,7 @@ const StudentResultsPage = () => {
   const podium = results.leaderboard ? results.leaderboard.slice(0, 3) : [];
 
   return (
-    <div className="student-layout" style={{ overflow: 'hidden' }}>
+    <div className="student-layout student-results-page-bg" style={{ overflow: 'hidden' }}>
       
       <div style={{ textAlign: 'center', margin: 'clamp(0.5rem, 3vh, 1.5rem) 0 0 0' }} className="hebrew-text">
         <h1 style={{ fontSize: 'clamp(2rem, 5vh, 3.5rem)', color: 'var(--neon-blue)', textShadow: '0 0 20px var(--neon-blue)', textTransform: 'uppercase', margin: 0 }}>המרוץ הסתיים!</h1>

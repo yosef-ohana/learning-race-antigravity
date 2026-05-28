@@ -37,7 +37,7 @@ const TeacherLoginPage = () => {
 
   return (
     <Layout>
-      <div className="auth-page">
+      <div className="auth-page teacher-login-page">
         <Card className="auth-box">
           <h2 style={{marginTop: 0}}>התחברות מורה</h2>
           {error && <div style={{ color: 'red', marginBottom: '1rem' }}>{error}</div>}

@@ -38,7 +38,7 @@ const StudentJoinPage = () => {
   };
 
   return (
-    <div className="join-page-container">
+    <div className="join-page-container student-join-page">
       <div className="join-page-bg"></div>
       
       <div className="join-header">

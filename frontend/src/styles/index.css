@@ -97,22 +97,21 @@ body {
   font-family: var(--font-main);
 }
 .student-top {
-  /* Bound the track area: never more than 45% of viewport height */
-  flex: 0 1 auto;
-  min-height: 0;
-  max-height: 45dvh;
-  min-height: 170px;
+  /* Track area — ~68% of viewport (flex basis 68%, min-height for readability) */
+  flex: 0 0 68dvh;
+  min-height: 180px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0.8rem;
+  padding: 0.4rem 0.8rem 0.4rem;
   border-bottom: 2px solid var(--neon-purple);
   box-shadow: 0 5px 15px rgba(188,19,254,0.3);
 }
 .student-bottom {
+  /* Question area — remaining ~32% */
   flex: 1 1 0;
   min-height: 0;
-  padding: 1rem;
+  padding: 0.5rem 0.8rem;
   display: flex;
   flex-direction: column;
   position: relative;
@@ -134,7 +133,7 @@ body {
 }
 .option-btn:hover { background: rgba(0, 243, 255, 0.15); color: #fff; box-shadow: 0 0 30px var(--neon-blue); border-color: #fff; }
 
-.timer-container { height: 15px; background: rgba(0,255,0,0.1); border: 1px solid var(--neon-green); border-radius: 8px; overflow: hidden; margin-bottom: 1rem; }
+.timer-container { height: 10px; background: rgba(0,255,0,0.1); border: 1px solid var(--neon-green); border-radius: 8px; overflow: hidden; margin-bottom: 0.4rem; }
 .timer-fill { height: 100%; background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); transition: width 0.1s linear; }
 
 .overlay-blur {
@@ -165,7 +164,7 @@ body {
 .question-container {
   display: flex;
   flex-direction: row;
-  gap: 2rem;
+  gap: 1rem;
   height: 100%;
 }
 .question-left-pane {
@@ -365,16 +364,18 @@ body {
   flex: 1;
   padding: 2rem;
   width: 100%;
+  min-height: calc(100vh - 120px);
+  box-sizing: border-box;
 }
 
 .auth-box {
   width: 100%;
-  max-width: 400px;
+  max-width: 380px;
   background: rgba(5, 5, 16, 0.85) !important;
   border: 2px solid var(--neon-purple) !important;
-  border-radius: 20px !important;
-  padding: 2rem !important;
-  box-shadow: 0 0 40px rgba(188, 19, 254, 0.25), inset 0 0 20px rgba(188, 19, 254, 0.15) !important;
+  border-radius: 16px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 0 35px rgba(188, 19, 254, 0.25), inset 0 0 15px rgba(188, 19, 254, 0.15) !important;
   backdrop-filter: blur(10px);
   text-align: center;
 }
@@ -1150,8 +1151,8 @@ body {
 /* --- TEACHER LOBBY STYLES --- */
 .t-lobby-content {
   display: flex;
-  gap: 3rem;
-  padding: 8rem 4rem 2rem;
+  gap: clamp(1rem, 2.5vw, 2rem);
+  padding: clamp(4.5rem, 8vh, 6.5rem) 2rem 1rem;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
@@ -1164,16 +1165,17 @@ body {
   flex: 2;
   background: rgba(10, 10, 25, 0.6);
   border: 1px solid rgba(0, 150, 255, 0.3);
-  border-radius: 20px;
-  padding: 2.5rem;
+  border-radius: 16px;
+  padding: clamp(1rem, 2.2vh, 1.5rem);
   box-shadow: inset 0 0 30px rgba(0, 150, 255, 0.1), 0 0 20px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .t-lobby-title-area {
-  margin-bottom: 2rem;
+  margin-bottom: clamp(0.5rem, 1.2vh, 1rem);
   text-align: center;
 }
 
@@ -1181,32 +1183,33 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 2.5rem;
-  margin: 0 0 0.5rem 0;
+  font-size: clamp(1.4rem, 2.8vh, 2rem);
+  margin: 0 0 0.3rem 0;
   color: white;
   text-shadow: 0 0 10px rgba(255,255,255,0.3);
 }
 
 .t-lobby-subtitle {
   color: #ccc;
-  font-size: 1.1rem;
+  font-size: clamp(0.85rem, 1.8vh, 0.95rem);
   margin: 0;
 }
 
 .t-lobby-stats-row {
   display: flex;
-  gap: 2rem;
-  margin-bottom: 3rem;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  margin-bottom: clamp(0.8rem, 1.8vh, 1.2rem);
   justify-content: center;
+  align-items: center;
 }
 
 .t-lobby-code-box {
   background: transparent;
   border: 2px solid var(--neon-purple);
-  border-radius: 16px;
-  padding: 1.5rem 3rem;
+  border-radius: 12px;
+  padding: 0.6rem 1.5rem;
   text-align: center;
-  box-shadow: 0 0 20px rgba(175, 77, 255, 0.2), inset 0 0 20px rgba(175, 77, 255, 0.1);
+  box-shadow: 0 0 15px rgba(175, 77, 255, 0.2), inset 0 0 15px rgba(175, 77, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1214,16 +1217,16 @@ body {
 
 .t-code-label {
   color: #aaa;
-  font-size: 1rem;
-  margin-bottom: 0.5rem;
+  font-size: clamp(0.8rem, 1.6vh, 0.9rem);
+  margin-bottom: 0.2rem;
 }
 
 .t-code-val {
-  font-size: 4rem;
+  font-size: clamp(2rem, 4.5vh, 2.8rem);
   font-weight: bold;
-  letter-spacing: 5px;
+  letter-spacing: 3px;
   color: white;
-  text-shadow: 0 0 15px var(--neon-purple);
+  text-shadow: 0 0 12px var(--neon-purple);
   line-height: 1;
 }
 
@@ -1231,8 +1234,8 @@ body {
   display: flex;
   align-items: center;
   color: var(--neon-blue);
-  font-size: 0.9rem;
-  margin-top: 1rem;
+  font-size: clamp(0.75rem, 1.5vh, 0.85rem);
+  margin-top: 0.4rem;
   cursor: pointer;
 }
 
@@ -1243,11 +1246,11 @@ body {
 }
 
 .t-count-circle {
-  width: 140px;
-  height: 140px;
+  width: clamp(90px, 15vh, 110px);
+  height: clamp(90px, 15vh, 110px);
   border-radius: 50%;
-  border: 4px solid var(--neon-blue);
-  box-shadow: 0 0 20px rgba(0, 243, 255, 0.3), inset 0 0 20px rgba(0, 243, 255, 0.2);
+  border: 3px solid var(--neon-blue);
+  box-shadow: 0 0 15px rgba(0, 243, 255, 0.3), inset 0 0 15px rgba(0, 243, 255, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -1261,7 +1264,7 @@ body {
 }
 
 .t-count-val {
-  font-size: 2.5rem;
+  font-size: clamp(1.5rem, 3vh, 1.9rem);
   font-weight: bold;
   color: white;
   text-shadow: 0 0 10px var(--neon-blue);
@@ -1269,27 +1272,28 @@ body {
 
 .t-count-label {
   color: #ccc;
-  font-size: 1rem;
+  font-size: clamp(0.75rem, 1.5vh, 0.85rem);
 }
 
 .t-lobby-roster-area {
   flex: 1;
-  margin-bottom: 2rem;
+  margin-bottom: clamp(0.8rem, 1.8vh, 1.2rem);
+  min-height: 0;
 }
 
 .t-roster-title {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: 0.8rem;
   color: var(--neon-blue);
-  font-size: 1.1rem;
-  margin-bottom: 1.5rem;
+  font-size: clamp(0.9rem, 1.8vh, 1.05rem);
+  margin-bottom: clamp(0.6rem, 1.5vh, 1rem);
 }
 
 .t-roster-title-line {
   height: 1px;
-  width: 100px;
+  width: clamp(60px, 8vw, 100px);
   background: linear-gradient(90deg, transparent, var(--neon-blue), transparent);
 }
 
@@ -1297,24 +1301,24 @@ body {
   background: rgba(0, 255, 100, 0.1);
   border: 2px solid var(--neon-green);
   color: white;
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 2.2vh, 1.3rem);
   font-weight: bold;
-  padding: 1rem 3rem;
-  border-radius: 40px;
+  padding: 0.6rem 2.2rem;
+  border-radius: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s;
-  box-shadow: 0 0 20px rgba(0, 255, 100, 0.3), inset 0 0 10px rgba(0, 255, 100, 0.2);
+  box-shadow: 0 0 15px rgba(0, 255, 100, 0.3), inset 0 0 8px rgba(0, 255, 100, 0.2);
   width: max-content;
   margin: 0 auto;
 }
 
 .t-btn-start:hover:not(.disabled) {
   background: rgba(0, 255, 100, 0.3);
-  box-shadow: 0 0 40px rgba(0, 255, 100, 0.5);
-  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 255, 100, 0.5);
+  transform: scale(1.03);
 }
 
 .t-btn-start.disabled {
@@ -1331,13 +1335,14 @@ body {
   flex: 1;
   background: rgba(10, 10, 25, 0.6);
   border: 1px solid rgba(175, 77, 255, 0.3);
-  border-radius: 20px;
-  padding: 2.5rem;
+  border-radius: 16px;
+  padding: clamp(1rem, 2.2vh, 1.5rem);
   box-shadow: inset 0 0 30px rgba(175, 77, 255, 0.1), 0 0 20px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: clamp(0.8rem, 1.8vh, 1.2rem);
+  min-width: 0;
 }
 
 .t-info-block {
@@ -1347,57 +1352,58 @@ body {
 .t-info-title {
   display: flex;
   align-items: center;
-  font-size: 1.5rem;
+  font-size: clamp(1.1rem, 2.2vh, 1.3rem);
   color: white;
   margin-top: 0;
-  margin-bottom: 1rem;
+  margin-bottom: clamp(0.4rem, 1vh, 0.7rem);
 }
 
 .t-info-block p {
   color: #ccc;
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
+  margin: 0.3rem 0;
+  font-size: clamp(0.85rem, 1.8vh, 0.95rem);
 }
 
 .t-info-link {
   color: var(--neon-green) !important;
   font-weight: bold;
-  font-size: 1.3rem !important;
+  font-size: clamp(1rem, 2.2vh, 1.25rem) !important;
   text-shadow: 0 0 10px rgba(0,255,100,0.5);
 }
 
 .t-info-divider {
   height: 1px;
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  margin: clamp(0.3rem, 1vh, 0.6rem) 0;
 }
 
 .t-info-flag {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 1.5rem;
+  gap: 0.8rem;
+  font-size: clamp(1.1rem, 2.2vh, 1.3rem);
   font-weight: bold;
   color: white;
-  margin-top: 1rem;
+  margin-top: clamp(0.4rem, 1vh, 0.8rem);
 }
 
 /* Enhancements for ParticipantList in Teacher mode */
 .teacher-roster {
-  gap: 1rem;
+  gap: clamp(0.4rem, 1vw, 0.8rem);
 }
 
 .roster-item.roster-box {
-  width: 150px;
-  height: 110px;
-  border-radius: 12px;
+  width: clamp(95px, 14vw, 115px);
+  height: clamp(75px, 12vh, 85px);
+  border-radius: 10px;
   background: rgba(0,0,0,0.4);
   position: relative;
-  padding: 0.5rem;
+  padding: 0.3rem 0.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: clamp(0.1rem, 0.5vh, 0.3rem);
   transition: all 0.3s;
 }
 
@@ -1408,34 +1414,62 @@ body {
 
 .roster-slot-num {
   position: absolute;
-  top: 8px;
-  right: 8px;
-  width: 24px;
-  height: 24px;
-  border-radius: 4px;
+  top: 4px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: clamp(0.7rem, 1.5vh, 0.8rem);
   font-weight: bold;
 }
 
 .roster-name-empty {
-  font-size: 1rem;
+  font-size: clamp(0.8rem, 1.6vh, 0.9rem);
   color: #888;
 }
 
 /* --- TEACHER RESULTS STYLES --- */
+/* --- TEACHER RESULTS STYLES --- */
+/* Compact header specifically on results page */
+.t-results-page .dashboard-header {
+  padding: 0.5rem 2rem;
+}
+
+.t-results-page .dashboard-brand h1 {
+  font-size: 1.8rem !important;
+}
+
+.t-results-page .dashboard-brand .join-subtitle {
+  font-size: 0.8rem !important;
+  margin-top: 0 !important;
+}
+
+.t-results-page .dashboard-actions button {
+  padding: 0.4rem 1rem;
+}
+
+.t-results-page .dashboard-actions button svg {
+  width: 18px;
+  height: 18px;
+}
+
+.t-results-page .dashboard-actions button div div {
+  font-size: 0.95rem !important;
+}
+
 .t-results-content {
   flex: 1;
   min-height: 0;
-  padding: clamp(1rem, 2.5vh, 2rem) 4rem 1.5rem;
-  max-width: 1200px;
+  padding: clamp(0.5rem, 1.5vh, 1.2rem) 2rem 0.8rem;
+  max-width: 1400px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(1rem, 2.5vh, 2.5rem);
+  gap: clamp(0.5rem, 1.5vh, 1rem);
   z-index: 10;
   position: relative;
   width: 100%;
@@ -1444,11 +1478,11 @@ body {
 
 .t-podium-header {
   text-align: center;
-  margin-bottom: clamp(0.5rem, 1.5vh, 1.5rem);
+  margin-bottom: clamp(0.3rem, 1vh, 0.8rem);
 }
 
 .t-podium-title {
-  font-size: clamp(1.8rem, 4vh, 2.8rem);
+  font-size: clamp(1.4rem, 3vh, 2rem);
   font-weight: bold;
   color: white;
   margin: 0;
@@ -1459,28 +1493,29 @@ body {
 }
 
 .t-podium-subtitle {
-  font-size: clamp(1rem, 2.2vh, 1.3rem);
+  font-size: clamp(0.9rem, 2vh, 1.15rem);
   color: #ccc;
-  margin-top: 0.2rem;
+  margin-top: 0.1rem;
 }
 
 .t-podium-grid {
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: clamp(0.8rem, 2vw, 2rem);
+  gap: clamp(0.4rem, 1vw, 1rem);
 }
 
 .t-podium-item {
   background: rgba(0,0,0,0.5);
   border: 1px solid;
-  border-radius: 20px;
+  border-radius: 16px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(0.5rem, 1.5vh, 1.2rem) 1rem;
+  padding: 0.4rem 0.6rem;
   position: relative;
   backdrop-filter: blur(10px);
+  box-sizing: border-box;
 }
 
 .t-podium-item.place-1 {
@@ -1494,44 +1529,52 @@ body {
 }
 
 .t-podium-badge {
-  width: clamp(30px, 4vh, 40px);
-  height: clamp(30px, 4vh, 40px);
+  width: clamp(22px, 3vh, 30px);
+  height: clamp(22px, 3vh, 30px);
   border-radius: 50%;
   border: 2px solid;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: clamp(1.1rem, 2vh, 1.5rem);
+  font-size: clamp(0.85rem, 1.8vh, 1.1rem);
   font-weight: bold;
-  margin-bottom: clamp(0.3rem, 1vh, 0.8rem);
+  margin-bottom: clamp(0.2rem, 0.6vh, 0.4rem);
   background: rgba(0,0,0,0.5);
 }
 
 .t-podium-name {
-  font-size: clamp(1.2rem, 2.4vh, 1.6rem);
+  font-size: clamp(0.95rem, 1.8vh, 1.25rem);
   font-weight: bold;
   color: white;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.2rem;
+  width: 100%;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .t-podium-points {
-  font-size: clamp(1rem, 2vh, 1.3rem);
+  font-size: clamp(0.8rem, 1.6vh, 1.05rem);
   font-weight: bold;
   margin-bottom: auto;
 }
 
 .t-podium-car {
-  margin-bottom: clamp(0.3rem, 1vh, 0.8rem);
+  margin-bottom: clamp(0.2rem, 0.6vh, 0.4rem);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .t-podium-car svg {
-  width: clamp(70px, 10vw, 120px);
+  width: clamp(50px, 7vw, 90px);
   height: auto;
 }
 
 /* Mirror for Lamborghini image asset */
 .t-podium-car .car-icon-asset {
-  width: clamp(70px, 10vw, 120px);
+  width: clamp(50px, 7vw, 90px);
   height: auto;
 }
 
@@ -1551,7 +1594,7 @@ body {
   background: rgba(10, 10, 25, 0.8);
   border: 1px solid rgba(0, 150, 255, 0.3);
   border-radius: 20px;
-  padding: clamp(0.8rem, 2vh, 1.5rem) 2rem;
+  padding: clamp(0.5rem, 1.5vh, 1rem) 1.5rem;
   box-shadow: inset 0 0 30px rgba(0, 150, 255, 0.1), 0 0 20px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(10px);
   display: flex;
@@ -1560,9 +1603,9 @@ body {
 
 .t-results-table-title {
   color: var(--neon-blue);
-  font-size: clamp(1.1rem, 2.2vh, 1.5rem);
+  font-size: clamp(1rem, 2vh, 1.3rem);
   margin-top: 0;
-  margin-bottom: clamp(0.5rem, 1.5vh, 1rem);
+  margin-bottom: clamp(0.3rem, 1vh, 0.7rem);
   text-align: center;
 }
 
@@ -1581,23 +1624,50 @@ body {
 
 .t-results-table th {
   color: #888;
-  font-size: clamp(0.9rem, 2vh, 1.1rem);
+  font-size: clamp(0.8rem, 1.6vh, 0.95rem);
   font-weight: normal;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding: clamp(0.4rem, 1.2vh, 0.8rem) 1rem;
+  padding: 0.4rem 0.5rem;
   text-align: center;
 }
 
 .t-results-table td {
-  padding: clamp(0.3rem, 1.1vh, 0.7rem) 1rem;
+  padding: 0.35rem 0.5rem;
   text-align: center;
   border-bottom: 1px solid rgba(255,255,255,0.05);
   vertical-align: middle;
 }
 
 .t-res-rank {
-  font-size: 1.5rem;
+  font-size: clamp(1rem, 2vh, 1.3rem);
   font-weight: bold;
+}
+
+/* Widescreen Wideside layout */
+@media (min-width: 1024px) {
+  .t-results-content {
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: center;
+    gap: 2.5rem;
+    height: 100%;
+  }
+
+  .t-podium-section {
+    flex: 1.1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-width: 0;
+    height: 100%;
+  }
+
+  .t-results-table-section {
+    flex: 0.9;
+    height: 100%;
+    min-width: 0;
+  }
 }
 
 /* RTL & Hebrew Text Helpers for Batch 1A */
@@ -1865,7 +1935,7 @@ body {
   min-height: 0;
   height: 100%;
   /* Gap shrinks as participant count grows */
-  gap: clamp(0.15rem, calc(1rem - var(--participant-count, 2) * 0.1rem), 0.6rem);
+  gap: clamp(0.1rem, calc(0.5rem - var(--participant-count, 2) * 0.04rem), 0.4rem);
   width: 100%;
 }
 
@@ -1874,13 +1944,13 @@ body {
   align-items: center;
   flex: 1;
   min-height: 0;
-  /* cap so rows don't stretch excessively with only 2 participants */
-  max-height: clamp(40px, calc(120px - var(--participant-count, 2) * 8px), 90px);
+  /* Rows grow freely — capped only at a generous max so 1-2 participants look nice too */
+  max-height: clamp(44px, calc(160px - var(--participant-count, 1) * 12px), 120px);
   background: rgba(10, 10, 25, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   /* Vertical padding shrinks with more participants */
-  padding: clamp(0.15rem, calc(0.9rem - var(--participant-count, 2) * 0.08rem), 0.55rem) 0.8rem;
+  padding: clamp(0.1rem, calc(0.7rem - var(--participant-count, 1) * 0.06rem), 0.45rem) 0.8rem;
   gap: 0.8rem;
   position: relative;
   overflow: hidden;
@@ -1991,16 +2061,16 @@ body {
   z-index: 2;
 }
 
-/* Scale student car SVG dynamically with participant count */
+/* Car scales to ~72% of lane height, itself driven by --lane-height set by RaceTrack */
 .student-track-car svg {
-  width: clamp(24px, calc(48px - var(--participant-count, 2) * 3px), 40px);
-  height: clamp(12px, calc(24px - var(--participant-count, 2) * 1.5px), 20px);
+  width: calc(var(--student-car-height, 28px) * 2);
+  height: var(--student-car-height, 28px);
 }
 
 /* Mirror for Lamborghini image asset */
 .student-track-car .car-icon-asset {
-  width: clamp(24px, calc(48px - var(--participant-count, 2) * 3px), 40px);
-  height: clamp(12px, calc(24px - var(--participant-count, 2) * 1.5px), 20px);
+  width: calc(var(--student-car-height, 28px) * 2);
+  height: var(--student-car-height, 28px);
 }
 
 .student-track-finish-line {
@@ -2192,4 +2262,59 @@ body {
   border-color: #888;
   color: #bbb;
   box-shadow: 0 0 10px rgba(136, 136, 136, 0.2);
+}
+
+/* Scoped styles for Teacher & Student entry screens background */
+.teacher-login-page {
+  background-image: linear-gradient(rgba(10, 10, 30, 0.65), rgba(10, 10, 30, 0.65)), url('../assets/neon-race-auth-bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border-radius: 16px;
+  box-shadow: 0 0 35px rgba(0, 0, 0, 0.5);
+}
+
+.student-join-page {
+  background-image: linear-gradient(rgba(10, 10, 30, 0.65), rgba(10, 10, 30, 0.65)), url('../assets/neon-race-auth-bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Scoped styles for Teacher & Student results screens background */
+.teacher-results-page-bg {
+  background-image: linear-gradient(rgba(10, 10, 30, 0.65), rgba(10, 10, 30, 0.65)), url('../assets/neon-results-bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+.student-results-page-bg {
+  background-image: linear-gradient(rgba(10, 10, 30, 0.65), rgba(10, 10, 30, 0.65)), url('../assets/neon-results-bg.png') !important;
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Surgical UI Fix — Make Teacher Login Box Smaller And More Elegant */
+.teacher-login-page .auth-box {
+  max-width: 320px !important;
+  padding: 1.25rem 1.5rem !important;
+}
+
+.teacher-login-page .auth-box h2 {
+  font-size: 1.5rem !important;
+  margin-top: 0 !important;
+  margin-bottom: 1rem !important;
+}
+
+.teacher-login-page .auth-box .input {
+  margin-bottom: 0.75rem !important;
+  padding: 0.45rem 0.75rem !important;
+  font-size: 0.95rem !important;
+}
+
+.teacher-login-page .auth-box .btn {
+  padding: 0.5rem 1rem !important;
+  font-size: 0.95rem !important;
 }

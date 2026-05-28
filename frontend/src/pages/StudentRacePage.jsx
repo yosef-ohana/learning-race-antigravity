@@ -211,38 +211,38 @@ const StudentRacePage = () => {
         </div>
       )}
 
-      <div className="student-top" style={{ padding: '0.8rem' }}>
+      <div className="student-top" style={{ padding: '0.3rem 0.6rem 0.3rem' }}>
         
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.8rem', padding: '0 1rem' }}>
-          <div style={{ display: 'flex', gap: '2rem', alignItems: 'center' }}>
-            <div className="live-indicator hebrew-text" style={{ fontSize: '1rem' }}>שידור חי</div>
-            <div className="glow-card hebrew-text" style={{ padding: '0.5rem 1.5rem', fontSize: '1rem', border: '1px solid var(--neon-purple)', color: '#fff' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', padding: '0 0.4rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <div className="live-indicator hebrew-text" style={{ fontSize: '0.85rem' }}>שידור חי</div>
+            <div className="glow-card hebrew-text" style={{ padding: '0.3rem 0.8rem', fontSize: '0.85rem', border: '1px solid var(--neon-purple)', color: '#fff' }}>
               🏆 מיקום {state.playerState.rank}/{state.participantsPositions.length}
             </div>
           </div>
           
-          <div className="glow-card hebrew-text" style={{ padding: '0.5rem 2rem', color: 'var(--neon-blue)', borderColor: 'var(--neon-blue)', fontSize: '1.2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div className="glow-card hebrew-text" style={{ padding: '0.3rem 1rem', color: 'var(--neon-blue)', borderColor: 'var(--neon-blue)', fontSize: '1rem', display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
             <div>
-              <span style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{state.playerState.points}</span> נק'
+              <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{state.playerState.points}</span> נק'
             </div>
             {activeLuckMultiplier > 1 && (
-              <div style={{ padding: '0.2rem 0.5rem', background: 'rgba(0, 255, 0, 0.1)', border: '1px solid var(--neon-green)', borderRadius: '4px', color: 'var(--neon-green)', fontSize: '1rem', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-green)', whiteSpace: 'nowrap' }} className="hebrew-text">
+              <div style={{ padding: '0.1rem 0.4rem', background: 'rgba(0, 255, 0, 0.1)', border: '1px solid var(--neon-green)', borderRadius: '4px', color: 'var(--neon-green)', fontSize: '0.85rem', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-green)', whiteSpace: 'nowrap' }} className="hebrew-text">
                 ⚡ בוסט <span className="bidi-isolate">x1.5</span>
               </div>
             )}
             {activeLuckMultiplier < 1 && (
-              <div style={{ padding: '0.2rem 0.5rem', background: 'rgba(255, 0, 0, 0.1)', border: '1px solid var(--danger)', borderRadius: '4px', color: 'var(--danger)', fontSize: '1rem', fontWeight: 'bold', textShadow: '0 0 5px var(--danger)', whiteSpace: 'nowrap' }} className="hebrew-text">
+              <div style={{ padding: '0.1rem 0.4rem', background: 'rgba(255, 0, 0, 0.1)', border: '1px solid var(--danger)', borderRadius: '4px', color: 'var(--danger)', fontSize: '0.85rem', fontWeight: 'bold', textShadow: '0 0 5px var(--danger)', whiteSpace: 'nowrap' }} className="hebrew-text">
                 ⚠️ פנצ'ר <span className="bidi-isolate">x0.5</span>
               </div>
             )}
           </div>
           
-          <div style={{ display: 'flex', flexDirection: 'column', width: '250px' }} className="hebrew-text">
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px', fontSize: '0.9rem', color: 'var(--neon-purple)', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-purple)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', width: '200px' }} className="hebrew-text">
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px', fontSize: '0.8rem', color: 'var(--neon-purple)', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-purple)' }}>
               <span>מד החלטה</span>
               <span className="bidi-isolate">{state.playerState.decisionMeter || 0}%</span>
             </div>
-            <div className="decision-meter" style={{ width: '100%', height: '8px', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--neon-purple)' }}>
+            <div className="decision-meter" style={{ width: '100%', height: '6px', borderRadius: '3px', overflow: 'hidden', border: '1px solid var(--neon-purple)' }}>
               <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter || 0}%`, height: '100%', background: 'var(--neon-purple)', boxShadow: '0 0 10px var(--neon-purple)' }}></div>
             </div>
           </div>

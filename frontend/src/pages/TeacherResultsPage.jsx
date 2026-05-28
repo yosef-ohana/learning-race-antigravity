@@ -16,9 +16,11 @@ const PodiumItem = ({ place, data, leaderboard }) => {
     3: 'var(--neon-blue)' 
   };
   const color = colors[place] || 'var(--neon-blue)';
-  const height = place === 1 ? 'clamp(150px, 28vh, 260px)' : 'clamp(130px, 24vh, 220px)';
-  const width = place === 1 ? 'clamp(180px, 20vw, 240px)' : 'clamp(160px, 18vw, 220px)';
-  const marginTop = place === 1 ? '0' : 'clamp(15px, 4vh, 40px)';
+  const height = place === 1 ? 'clamp(120px, 20vh, 180px)' : 'clamp(100px, 17vh, 150px)';
+  const width = place === 1 ? 'clamp(130px, 15vw, 170px)' : 'clamp(110px, 13vw, 150px)';
+  const marginTop = place === 1 ? '0' : 'clamp(10px, 2.5vh, 25px)';
+  const carWidth = place === 1 ? 90 : 80;
+  const carHeight = place === 1 ? 45 : 40;
 
   return (
     <div className={`t-podium-item place-${place}`} style={{ width, height, marginTop, borderColor: color, boxShadow: `0 0 20px ${color}33, inset 0 0 20px ${color}33` }}>
@@ -29,7 +31,7 @@ const PodiumItem = ({ place, data, leaderboard }) => {
       <div className="t-podium-points" style={{ color: color, textShadow: `0 0 5px ${color}` }}>{data.points}</div>
       
       <div className="t-podium-car">
-        <CarIcon color={getParticipantColor(data, leaderboard, place - 1)} width={120} height={60} />
+        <CarIcon color={getParticipantColor(data, leaderboard, place - 1)} width={carWidth} height={carHeight} />
       </div>
       <div className="t-podium-glow-base" style={{ background: color, boxShadow: `0 0 30px ${color}` }}></div>
     </div>
@@ -65,7 +67,7 @@ const TeacherResultsPage = () => {
   const third = sortedLeaderboard[2];
 
   return (
-    <div className="dashboard-container t-results-page" style={{ direction: 'rtl', overflow: 'hidden' }}>
+    <div className="dashboard-container t-results-page teacher-results-page-bg" style={{ direction: 'rtl', overflow: 'hidden' }}>
       <div className="join-page-bg"></div>
 
       {/* TOP HEADER */}
@@ -102,7 +104,7 @@ const TeacherResultsPage = () => {
           <div className="t-podium-header">
             <h1 className="t-podium-title">
               המרוץ הסתיים!
-              <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="gold" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '15px' }}><path d="M8 21h8m-4-4v4m-5-4h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="gold" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}><path d="M8 21h8m-4-4v4m-5-4h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </h1>
             {results.winner && <p className="t-podium-subtitle">המנצח: {results.winner.displayName}</p>}
           </div>
@@ -114,7 +116,7 @@ const TeacherResultsPage = () => {
           </div>
           
           {results.summaryStats && (
-            <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: '1.2rem', marginTop: '2rem' }}>
+            <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: 'clamp(0.95rem, 1.8vh, 1.15rem)', marginTop: '0.8rem' }}>
               {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
             </div>
           )}

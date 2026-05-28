@@ -18,8 +18,8 @@ const ParticipantList = ({ participants, variant = 'standard', currentUserId = n
           return (
             <div key={`empty-${index}`} className="roster-item roster-box empty-slot">
               <div className="roster-slot-num" style={{ background: 'rgba(255,255,255,0.1)', color: '#888' }}>{index + 1}</div>
-              <div className="roster-avatar-empty" style={{ marginTop: '10px' }}>
-                <svg width="40" height="20" viewBox="0 0 40 20" fill="rgba(255,255,255,0.1)">
+              <div className="roster-avatar-empty" style={{ marginTop: '4px' }}>
+                <svg width="28" height="14" viewBox="0 0 40 20" fill="rgba(255,255,255,0.1)">
                   <path d="M5 15 L 5 5 L 10 5 L 15 0 L 30 0 L 35 5 L 35 15 Z"/>
                   <circle cx="10" cy="15" r="4" fill="rgba(0,0,0,0.5)"/>
                   <circle cx="30" cy="15" r="4" fill="rgba(0,0,0,0.5)"/>
@@ -39,7 +39,7 @@ const ParticipantList = ({ participants, variant = 'standard', currentUserId = n
             )}
             <div className="roster-avatar" style={variant === 'teacher' ? { border: 'none', boxShadow: 'none' } : { borderColor: color, boxShadow: `0 0 10px ${color}, inset 0 0 10px ${color}` }}>
               {variant === 'teacher' ? (
-                <CarIcon color={color} width={60} height={30} style={{ marginTop: '5px' }} />
+                <CarIcon color={color} width={46} height={23} style={{ marginTop: '2px' }} />
               ) : (
                 <CarIcon color={color} width={40} height={20} />
               )}

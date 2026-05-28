@@ -87,18 +87,18 @@ const TeacherLobbyPage = () => {
       <div className="join-page-bg"></div>
 
       {/* TOP HEADER */}
-      <div className="dashboard-header" style={{ position: 'absolute', top: 0, left: 0, right: 0, borderBottom: 'none', background: 'transparent' }}>
-        <div style={{ width: '100px' }}></div>
+      <div className="dashboard-header" style={{ position: 'absolute', top: 0, left: 0, right: 0, borderBottom: 'none', background: 'transparent', padding: '0.5rem 2rem' }}>
+        <div style={{ width: '50px' }}></div>
         <div className="dashboard-brand" style={{ alignItems: 'center' }}>
-          <h1 className="join-title" style={{ fontSize: '3rem', margin: 0, justifyContent: 'center' }}>
+          <h1 className="join-title" style={{ fontSize: '2rem', margin: 0, justifyContent: 'center' }}>
             Math Race
-            <div className="checkered-flag-icon" style={{ transform: 'skewX(-15deg) scale(0.7)', marginLeft: '5px' }}>
+            <div className="checkered-flag-icon" style={{ transform: 'skewX(-15deg) scale(0.55)', marginLeft: '5px' }}>
               <div/><div/><div/><div/><div/><div/><div/><div/><div/>
             </div>
           </h1>
-          <div className="join-subtitle" style={{ fontSize: '1rem', marginTop: '5px' }}>מרוץ חשבון חווייתי בזמן אמת</div>
+          <div className="join-subtitle" style={{ fontSize: '0.8rem', marginTop: '2px' }}>מרוץ חשבון חווייתי בזמן אמת</div>
         </div>
-        <div style={{ width: '100px' }}></div>
+        <div style={{ width: '50px' }}></div>
       </div>
 
       <div className="t-lobby-content">

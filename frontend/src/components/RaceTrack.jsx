@@ -8,6 +8,16 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
   if (variant === 'dashboard') {
     const count = participantsPositions.length;
 
+    // Compute dynamic car height for dashboard: ~70% of estimated lane height.
+    // Dashboard track area is roughly window.innerHeight - 250px (header+footer).
+    const trackAreaPx = Math.max(200, window.innerHeight - 250 - (count - 1) * 10);
+    const rawLaneH = Math.floor(trackAreaPx / count);
+    const laneH = Math.min(180, Math.max(50, rawLaneH));
+    const carH = Math.round(laneH * 0.70);
+    const dashCarH = Math.min(100, Math.max(24, carH));
+    const dashCarW = dashCarH * 2;
+    const carOffset = Math.round(dashCarW / 2);
+
     return (
       <div className="dashboard-track-list" style={{ '--participant-count': count }}>
         <div className="track-finish-line-pattern"></div>
@@ -44,8 +54,8 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
                 <div className="dash-bar-bg"></div>
                 <div className="dash-bar-fill" style={{ width: `${percent}%`, left: 0, background: `linear-gradient(90deg, transparent, ${color})`, boxShadow: `5px 0 15px ${color}` }}></div>
                 
-                <div className="dash-car" style={{ left: `calc(${percent}% - 25px)`, top: '50%', transform: 'translateY(-50%)' }}>
-                  <CarIcon color={color} width={50} height={25} />
+                <div className="dash-car" style={{ left: `calc(${percent}% - ${carOffset}px)`, top: '50%', transform: 'translateY(-50%)' }}>
+                  <CarIcon color={color} width={dashCarW} height={dashCarH} />
                 </div>
               </div>
 
@@ -61,14 +71,26 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
   }
 
   // Student standard rendering — visually aligned with teacher dashboard
+  // Compute dynamic car height: ~72% of estimated lane height.
+  // Lane height estimate: (68vh track area - header ~48px - gaps) / count
+  // We use a JS approximation and clamp so the car never overflows or disappears.
   const count = participantsPositions.length;
+  const trackAreaPx = Math.round(window.innerHeight * 0.68) - 48 - (count - 1) * 4;
+  const rawLaneH = Math.floor(trackAreaPx / count);
+  const laneH = Math.min(120, Math.max(44, rawLaneH));
+  const carH = Math.round(laneH * 0.72);
+  const studentCarHeight = `${Math.min(80, Math.max(18, carH))}px`;
+
   return (
-    <div className="student-track-list" style={{ '--participant-count': count }}>
+    <div className="student-track-list" style={{ '--participant-count': count, '--student-car-height': studentCarHeight }}>
       {participantsPositions.map((p, idx) => {
         const percent = Math.min(95, Math.max(0, (p.position / TRACK_LENGTH) * 100));
         const isMe = p.id === currentUserId;
         const color = getParticipantColor(p, participantsPositions, idx);
         const rank = p.rank || idx + 1;
+        // Car position offset = half the car width (car width = 2 * carH)
+        const carW = Math.min(160, Math.max(36, carH * 2));
+        const carOffset = Math.round(carW / 2);
 
         return (
           <div
@@ -98,8 +120,8 @@ const RaceTrack = ({ participantsPositions, currentUserId, variant = 'standard' 
                   boxShadow: `5px 0 15px ${color}`
                 }}
               />
-              <div className="student-track-car" style={{ left: `calc(${percent}% - 20px)` }}>
-                <CarIcon color={color} width={40} height={20} />
+              <div className="student-track-car" style={{ left: `calc(${percent}% - ${carOffset}px)` }}>
+                <CarIcon color={color} width={carW} height={carH} />
               </div>
               {/* Finish line marker */}
               <div className="student-track-finish-line" />

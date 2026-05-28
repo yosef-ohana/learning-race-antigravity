@@ -28,11 +28,13 @@ const Leaderboard = ({ leaderboard, variant = 'standard' }) => {
                       {rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}
                     </div>
                   </td>
-                  <td style={{ fontWeight: 'bold', fontSize: '1.2rem' }}>{entry.displayName}</td>
+                  <td style={{ fontWeight: 'bold', fontSize: 'clamp(0.95rem, 1.8vh, 1.15rem)' }}>{entry.displayName}</td>
                   <td>
-                    <CarIcon color={color} width={60} height={30} />
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      <CarIcon color={color} width={46} height={23} />
+                    </div>
                   </td>
-                  <td style={{ color: color, fontWeight: 'bold', fontSize: '1.4rem', textShadow: `0 0 10px ${color}` }}>
+                  <td style={{ color: color, fontWeight: 'bold', fontSize: 'clamp(1rem, 2vh, 1.3rem)', textShadow: `0 0 10px ${color}` }}>
                     {entry.points}
                   </td>
                 </tr>

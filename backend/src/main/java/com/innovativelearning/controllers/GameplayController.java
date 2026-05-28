@@ -176,19 +176,6 @@ public class GameplayController {
 
         ParticipantState afterState = participant.getCurrentState();
 
-        if (afterState == ParticipantState.DECISION_PENDING) {
-            if (beforeState != afterState) {
-                broadcastRaceUpdate(raceId);
-            }
-            return null;
-        }
-        if (afterState == ParticipantState.FROZEN) {
-            if (beforeState != afterState) {
-                broadcastRaceUpdate(raceId);
-            }
-            return null;
-        }
-
         List<RaceQuestionEntity> existingQs = persist.executeQuery(
             "from RaceQuestionEntity where participantId = :pid",
             Map.of("pid", participant.getId()), RaceQuestionEntity.class);
@@ -211,6 +198,21 @@ public class GameplayController {
                 }
             }
         }
+
+        if (afterState == ParticipantState.DECISION_PENDING && activeQ == null) {
+            if (beforeState != afterState) {
+                broadcastRaceUpdate(raceId);
+            }
+            return null;
+        }
+        if (afterState == ParticipantState.FROZEN) {
+            if (beforeState != afterState) {
+                broadcastRaceUpdate(raceId);
+            }
+            return null;
+        }
+
+
         
         if (activeQ == null) {
             QuestionTemplateEntity tmpl = pickTemplate(participant, existingQs);
