@@ -171,30 +171,30 @@ public class RaceController {
             le.position = p.getPosition();
             le.isCurrentUser = (currentUser != null && currentUser.getId().equals(u.getId()));
             
-            int answeredCount = 0;
+            int displayedCount = 0;
             int correctCount = 0;
             int timedAnswersCount = 0;
-            long totalAnswerTimeMs = 0;
+            long totalAnswerTimeSeconds = 0;
             
             for (RaceQuestionEntity q : raceQuestions) {
                 if (q.getParticipantId() != null && q.getParticipantId().equals(p.getId())) {
+                    displayedCount++;
+                    if (Boolean.TRUE.equals(q.getWasCorrect())) {
+                        correctCount++;
+                    }
                     if (Boolean.TRUE.equals(q.getIsAnswered())) {
-                        answeredCount++;
-                        if (Boolean.TRUE.equals(q.getWasCorrect())) {
-                            correctCount++;
-                        }
                         if (q.getAnsweredAt() != null && q.getIssuedAt() != null && q.getAnsweredAt() >= q.getIssuedAt()) {
-                            totalAnswerTimeMs += (q.getAnsweredAt() - q.getIssuedAt());
+                            totalAnswerTimeSeconds += (q.getAnsweredAt() - q.getIssuedAt());
                             timedAnswersCount++;
                         }
                     }
                 }
             }
             
-            le.answeredQuestionsCount = answeredCount;
+            le.answeredQuestionsCount = displayedCount;
             le.correctAnswersCount = correctCount;
-            le.accuracyPercent = (answeredCount > 0) ? (int) Math.round(((double) correctCount / answeredCount) * 100) : 0;
-            le.averageAnswerTimeSeconds = (timedAnswersCount > 0) ? (int) Math.round((totalAnswerTimeMs / (double) timedAnswersCount) / 1000.0) : 0;
+            le.accuracyPercent = (displayedCount > 0) ? (int) Math.round(((double) correctCount / displayedCount) * 100) : 0;
+            le.averageAnswerTimeSeconds = (timedAnswersCount > 0) ? (int) Math.round(totalAnswerTimeSeconds / (double) timedAnswersCount) : 0;
             
             res.leaderboard.add(le);
         }

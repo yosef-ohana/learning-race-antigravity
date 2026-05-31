@@ -16,9 +16,9 @@ const PodiumItem = ({ place, data, leaderboard }) => {
     3: 'var(--neon-orange)' 
   };
   const color = colors[place] || 'var(--neon-blue)';
-  const width = place === 1 ? 'clamp(150px, 18vw, 200px)' : 'clamp(130px, 15vw, 170px)';
-  const carWidth = place === 1 ? 110 : 90;
-  const carHeight = place === 1 ? 55 : 45;
+  const width = place === 1 ? 'clamp(120px, 15vw, 160px)' : 'clamp(100px, 13vw, 140px)';
+  const carWidth = place === 1 ? 90 : 75;
+  const carHeight = place === 1 ? 45 : 37;
 
   return (
     <div className={`tr-podium-item place-${place}`} style={{ width }}>
@@ -96,67 +96,31 @@ const TeacherResultsPage = () => {
         <div style={{ width: '150px' }}></div>
       </div>
 
-      <div className="tr-content-wrapper">
+      <div className="tr-content-wrapper" style={{ flexDirection: 'column', gap: 'clamp(0.5rem, 1.5vh, 1.5rem)' }}>
         
-        {/* Left Column: Podium & Table */}
-        <div className="tr-left-column">
+        <div className="tr-winners-section" style={{ flexShrink: 0 }}>
+          <div className="tr-podium-header hebrew-text">
+            <h1 style={{ fontSize: 'clamp(1.5rem, 4vh, 2.5rem)', margin: 0 }}><span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span> המרוץ הסתיים! <span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span></h1>
+            {results.winner && <p style={{ fontSize: 'clamp(0.9rem, 1.5vh, 1.1rem)', margin: '0.2rem 0 0 0' }}>כל הכבוד למנצחים!</p>}
+          </div>
           
-          <div className="tr-winners-section">
-            <div className="tr-podium-header hebrew-text">
-              <h1><span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span> המרוץ הסתיים! <span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span></h1>
-              {results.winner && <p>כל הכבוד למנצחים!</p>}
-            </div>
-            
-            <div className="tr-podium-container">
-              {second && <PodiumItem place={2} data={second} leaderboard={results.leaderboard} />}
-              {first && <PodiumItem place={1} data={first} leaderboard={results.leaderboard} />}
-              {third && <PodiumItem place={3} data={third} leaderboard={results.leaderboard} />}
-            </div>
-
-            {results.summaryStats && (
-              <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: 'clamp(0.95rem, 1.8vh, 1.15rem)', marginTop: '0.8rem' }} className="hebrew-text">
-                {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
-              </div>
-            )}
+          <div className="tr-podium-container">
+            {second && <PodiumItem place={2} data={second} leaderboard={results.leaderboard} />}
+            {first && <PodiumItem place={1} data={first} leaderboard={results.leaderboard} />}
+            {third && <PodiumItem place={3} data={third} leaderboard={results.leaderboard} />}
           </div>
 
-          <div className="tr-table-section">
-            <h2 className="tr-table-title hebrew-text">תוצאות סופיות</h2>
-            <div className={`tr-table-wrapper ${sortedLeaderboard.length <= 4 ? 'few-participants' : sortedLeaderboard.length >= 8 ? 'many-participants' : 'normal-participants'}`}>
-              <Leaderboard leaderboard={sortedLeaderboard} variant="teacher-table" />
+          {results.summaryStats && (
+            <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: 'clamp(0.85rem, 1.5vh, 1rem)', marginTop: '0.5rem' }} className="hebrew-text">
+              {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
             </div>
-          </div>
-
+          )}
         </div>
 
-        {/* Right Column: Batch 10R (Per-student stats) */}
-        <div className="tr-right-column">
-          <div className="tr-stats-panel hebrew-text">
-            <h2 className="tr-stats-title">סטטיסטיקות תלמידים</h2>
-            <div className="tr-stats-list">
-              {sortedLeaderboard.map(participant => (
-                <div key={participant.userId} className="tr-stat-participant-card">
-                  <div className="tr-stat-header">
-                    <span className="tr-stat-rank">{participant.rank}</span>
-                    <span className="tr-stat-name">{participant.displayName}</span>
-                  </div>
-                  <div className="tr-stat-metrics">
-                    <div className="tr-metric">
-                      <span className="tr-metric-label">דיוק:</span>
-                      <span className="tr-metric-value">{participant.accuracyPercent ?? 0}%</span>
-                    </div>
-                    <div className="tr-metric">
-                      <span className="tr-metric-label">נכונות:</span>
-                      <span className="tr-metric-value">{participant.correctAnswersCount ?? 0}/{participant.answeredQuestionsCount ?? 0}</span>
-                    </div>
-                    <div className="tr-metric">
-                      <span className="tr-metric-label">זמן ממוצע:</span>
-                      <span className="tr-metric-value">{participant.averageAnswerTimeSeconds ?? 0} שניות</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+        <div className="tr-table-section" style={{ flex: 1, minHeight: 0 }}>
+          <h2 className="tr-table-title hebrew-text" style={{ fontSize: 'clamp(1rem, 2vh, 1.3rem)', margin: '0 0 0.5rem 0', paddingBottom: '0.2rem' }}>תוצאות סופיות</h2>
+          <div className={`tr-table-wrapper ${sortedLeaderboard.length <= 4 ? 'few-participants' : sortedLeaderboard.length >= 8 ? 'many-participants' : 'normal-participants'}`} style={{ height: '100%' }}>
+            <Leaderboard leaderboard={sortedLeaderboard} variant="teacher-table" />
           </div>
         </div>
 

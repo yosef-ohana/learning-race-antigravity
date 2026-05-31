@@ -15,6 +15,9 @@ const Leaderboard = ({ leaderboard, variant = 'standard' }) => {
               <th>שחקן</th>
               <th>רכב</th>
               <th>נקודות</th>
+              <th>דיוק</th>
+              <th>נכונות</th>
+              <th>זמן ממוצע</th>
             </tr>
           </thead>
           <tbody>
@@ -36,6 +39,15 @@ const Leaderboard = ({ leaderboard, variant = 'standard' }) => {
                   </td>
                   <td style={{ color: color, fontWeight: 'bold', fontSize: 'clamp(1rem, 2vh, 1.3rem)', textShadow: `0 0 10px ${color}` }}>
                     {entry.points}
+                  </td>
+                  <td style={{ fontWeight: '500', color: 'var(--neon-blue)', fontSize: 'clamp(0.9rem, 1.6vh, 1.1rem)' }}>
+                    {entry.accuracyPercent ?? 0}%
+                  </td>
+                  <td style={{ fontWeight: '500', color: 'var(--neon-blue)', fontSize: 'clamp(0.9rem, 1.6vh, 1.1rem)' }}>
+                    {entry.correctAnswersCount ?? 0}/{entry.answeredQuestionsCount ?? 0}
+                  </td>
+                  <td style={{ fontWeight: '500', color: 'var(--neon-blue)', fontSize: 'clamp(0.9rem, 1.6vh, 1.1rem)' }}>
+                    {entry.averageAnswerTimeSeconds ?? 0}s
                   </td>
                 </tr>
               );
