@@ -265,8 +265,8 @@ const StudentRacePage = () => {
         )}
 
         {event && (
-          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90 }}>
-            <div className={`student-feedback-card ${event.includes('נכונה') ? 'success' : 'error'}`}>
+          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
+            <div className={`student-feedback-card ${event.includes('נכונה') ? 'success' : 'error'}`} style={{ pointerEvents: 'none' }}>
               <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>
                 {event.includes('נכונה') ? '🎉' : event.includes('זמן') ? '⏰' : '💥'}
               </div>
@@ -277,7 +277,7 @@ const StudentRacePage = () => {
 
         {luckPopup && (
           <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 100, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
-            <div className={`student-feedback-card luck ${luckPopup.type === 'BOOST' ? 'boost' : 'puncture'}`} style={{ pointerEvents: 'auto' }}>
+            <div className={`student-feedback-card luck ${luckPopup.type === 'BOOST' ? 'boost' : 'puncture'}`} style={{ pointerEvents: 'none' }}>
               <h1 style={{ 
                 fontSize: '1.6rem', 
                 color: luckPopup.type === 'BOOST' ? 'var(--neon-green)' : 'var(--danger)',

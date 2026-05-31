@@ -19,5 +19,9 @@ public class ResultsResponse {
         public int points;
         public int position;
         public boolean isCurrentUser;
+        public int answeredQuestionsCount;
+        public int correctAnswersCount;
+        public int accuracyPercent;
+        public int averageAnswerTimeSeconds;
     }
 }

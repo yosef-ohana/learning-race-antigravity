@@ -12,28 +12,27 @@ const PodiumItem = ({ place, data, leaderboard }) => {
   if (!data) return null;
   const colors = {
     1: 'var(--neon-orange)', 
-    2: '#ff00ff', 
-    3: 'var(--neon-blue)' 
+    2: 'var(--neon-purple)', 
+    3: 'var(--neon-orange)' 
   };
   const color = colors[place] || 'var(--neon-blue)';
-  const height = place === 1 ? 'clamp(120px, 20vh, 180px)' : 'clamp(100px, 17vh, 150px)';
-  const width = place === 1 ? 'clamp(130px, 15vw, 170px)' : 'clamp(110px, 13vw, 150px)';
-  const marginTop = place === 1 ? '0' : 'clamp(10px, 2.5vh, 25px)';
-  const carWidth = place === 1 ? 90 : 80;
-  const carHeight = place === 1 ? 45 : 40;
+  const width = place === 1 ? 'clamp(150px, 18vw, 200px)' : 'clamp(130px, 15vw, 170px)';
+  const carWidth = place === 1 ? 110 : 90;
+  const carHeight = place === 1 ? 55 : 45;
 
   return (
-    <div className={`t-podium-item place-${place}`} style={{ width, height, marginTop, borderColor: color, boxShadow: `0 0 20px ${color}33, inset 0 0 20px ${color}33` }}>
-      <div className="t-podium-badge" style={{ borderColor: color, color: color, textShadow: `0 0 10px ${color}` }}>
-        {place}
+    <div className={`tr-podium-item place-${place}`} style={{ width }}>
+      <div className="tr-podium-card" style={{ borderColor: color, boxShadow: `0 0 20px ${color}33, inset 0 0 20px ${color}33` }}>
+        <div className="tr-podium-rank" style={{ borderColor: color, color: '#fff', textShadow: `0 0 10px ${color}`, boxShadow: `0 0 10px ${color}, inset 0 0 5px ${color}` }}>
+          {place}
+        </div>
+        <div className="tr-podium-name hebrew-text">{data.displayName}</div>
+        <div className="tr-podium-score hebrew-text" style={{ color: color, textShadow: `0 0 5px ${color}` }}>{data.points}</div>
+        <div className="tr-podium-car">
+          <CarIcon color={getParticipantColor(data, leaderboard, place - 1)} width={carWidth} height={carHeight} />
+        </div>
       </div>
-      <div className="t-podium-name">{data.displayName}</div>
-      <div className="t-podium-points" style={{ color: color, textShadow: `0 0 5px ${color}` }}>{data.points}</div>
-      
-      <div className="t-podium-car">
-        <CarIcon color={getParticipantColor(data, leaderboard, place - 1)} width={carWidth} height={carHeight} />
-      </div>
-      <div className="t-podium-glow-base" style={{ background: color, boxShadow: `0 0 30px ${color}` }}></div>
+      <div className="tr-podium-base" style={{ background: `radial-gradient(ellipse at center, ${color} 0%, transparent 70%)` }}></div>
     </div>
   );
 };
@@ -67,9 +66,8 @@ const TeacherResultsPage = () => {
   const third = sortedLeaderboard[2];
 
   return (
-    <div className="dashboard-container t-results-page teacher-results-page-bg" style={{ direction: 'rtl', overflow: 'hidden' }}>
-      <div className="join-page-bg"></div>
-
+    <div className="dashboard-container teacher-results-page-bg" style={{ direction: 'rtl', overflow: 'hidden' }}>
+      
       {/* TOP HEADER */}
       <div className="dashboard-header" style={{ position: 'relative', borderBottom: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.8)' }}>
         
@@ -98,36 +96,72 @@ const TeacherResultsPage = () => {
         <div style={{ width: '150px' }}></div>
       </div>
 
-      <div className="t-results-content">
+      <div className="tr-content-wrapper">
         
-        <div className="t-podium-section">
-          <div className="t-podium-header">
-            <h1 className="t-podium-title">
-              המרוץ הסתיים!
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="gold" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '10px' }}><path d="M8 21h8m-4-4v4m-5-4h10a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            </h1>
-            {results.winner && <p className="t-podium-subtitle">המנצח: {results.winner.displayName}</p>}
-          </div>
+        {/* Left Column: Podium & Table */}
+        <div className="tr-left-column">
           
-          <div className="t-podium-grid">
-            {second && <PodiumItem place={2} data={second} leaderboard={results.leaderboard} />}
-            {first && <PodiumItem place={1} data={first} leaderboard={results.leaderboard} />}
-            {third && <PodiumItem place={3} data={third} leaderboard={results.leaderboard} />}
-          </div>
-          
-          {results.summaryStats && (
-            <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: 'clamp(0.95rem, 1.8vh, 1.15rem)', marginTop: '0.8rem' }}>
-              {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
+          <div className="tr-winners-section">
+            <div className="tr-podium-header hebrew-text">
+              <h1><span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span> המרוץ הסתיים! <span style={{color: 'gold', filter: 'drop-shadow(0 0 5px gold)'}}>🏆</span></h1>
+              {results.winner && <p>כל הכבוד למנצחים!</p>}
             </div>
-          )}
+            
+            <div className="tr-podium-container">
+              {second && <PodiumItem place={2} data={second} leaderboard={results.leaderboard} />}
+              {first && <PodiumItem place={1} data={first} leaderboard={results.leaderboard} />}
+              {third && <PodiumItem place={3} data={third} leaderboard={results.leaderboard} />}
+            </div>
+
+            {results.summaryStats && (
+              <div style={{ textAlign: 'center', color: 'var(--neon-green)', fontSize: 'clamp(0.95rem, 1.8vh, 1.15rem)', marginTop: '0.8rem' }} className="hebrew-text">
+                {results.summaryStats.replace("Race completed with", "המרוץ הושלם בהצלחה בהשתתפות").replace("participants.", "משתתפים.")}
+              </div>
+            )}
+          </div>
+
+          <div className="tr-table-section">
+            <h2 className="tr-table-title hebrew-text">תוצאות סופיות</h2>
+            <div className={`tr-table-wrapper ${sortedLeaderboard.length <= 4 ? 'few-participants' : sortedLeaderboard.length >= 8 ? 'many-participants' : 'normal-participants'}`}>
+              <Leaderboard leaderboard={sortedLeaderboard} variant="teacher-table" />
+            </div>
+          </div>
+
         </div>
 
-        <div className="t-results-table-section">
-          <h2 className="t-results-table-title">תוצאות סופיות</h2>
-          <Leaderboard leaderboard={sortedLeaderboard} variant="teacher-table" />
+        {/* Right Column: Batch 10R (Per-student stats) */}
+        <div className="tr-right-column">
+          <div className="tr-stats-panel hebrew-text">
+            <h2 className="tr-stats-title">סטטיסטיקות תלמידים</h2>
+            <div className="tr-stats-list">
+              {sortedLeaderboard.map(participant => (
+                <div key={participant.userId} className="tr-stat-participant-card">
+                  <div className="tr-stat-header">
+                    <span className="tr-stat-rank">{participant.rank}</span>
+                    <span className="tr-stat-name">{participant.displayName}</span>
+                  </div>
+                  <div className="tr-stat-metrics">
+                    <div className="tr-metric">
+                      <span className="tr-metric-label">דיוק:</span>
+                      <span className="tr-metric-value">{participant.accuracyPercent ?? 0}%</span>
+                    </div>
+                    <div className="tr-metric">
+                      <span className="tr-metric-label">נכונות:</span>
+                      <span className="tr-metric-value">{participant.correctAnswersCount ?? 0}/{participant.answeredQuestionsCount ?? 0}</span>
+                    </div>
+                    <div className="tr-metric">
+                      <span className="tr-metric-label">זמן ממוצע:</span>
+                      <span className="tr-metric-value">{participant.averageAnswerTimeSeconds ?? 0} שניות</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
       </div>
+
     </div>
   );
 };

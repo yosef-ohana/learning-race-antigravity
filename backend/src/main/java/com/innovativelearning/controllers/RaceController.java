@@ -2,6 +2,7 @@ package com.innovativelearning.controllers;
 
 import com.innovativelearning.entities.RaceEntity;
 import com.innovativelearning.entities.RaceParticipantEntity;
+import com.innovativelearning.entities.RaceQuestionEntity;
 import com.innovativelearning.entities.UserEntity;
 import com.innovativelearning.enums.RaceStatus;
 import com.innovativelearning.enums.UserRole;
@@ -156,6 +157,7 @@ public class RaceController {
         List<RaceParticipantEntity> parts = persist.executeQuery("from RaceParticipantEntity where raceId = :rid", Map.of("rid", raceId), RaceParticipantEntity.class);
         com.innovativelearning.utils.RaceUtils.sortParticipants(parts);
         UserEntity currentUser = persist.executeQuerySingle("from UserEntity where token = :t", Map.of("t", token), UserEntity.class);
+        List<RaceQuestionEntity> raceQuestions = persist.executeQuery("from RaceQuestionEntity where raceId = :rid", Map.of("rid", raceId), RaceQuestionEntity.class);
         ResultsResponse res = new ResultsResponse();
         res.leaderboard = new ArrayList<>();
         int rank = 1;
@@ -168,6 +170,32 @@ public class RaceController {
             le.points = p.getPoints();
             le.position = p.getPosition();
             le.isCurrentUser = (currentUser != null && currentUser.getId().equals(u.getId()));
+            
+            int answeredCount = 0;
+            int correctCount = 0;
+            int timedAnswersCount = 0;
+            long totalAnswerTimeMs = 0;
+            
+            for (RaceQuestionEntity q : raceQuestions) {
+                if (q.getParticipantId() != null && q.getParticipantId().equals(p.getId())) {
+                    if (Boolean.TRUE.equals(q.getIsAnswered())) {
+                        answeredCount++;
+                        if (Boolean.TRUE.equals(q.getWasCorrect())) {
+                            correctCount++;
+                        }
+                        if (q.getAnsweredAt() != null && q.getIssuedAt() != null && q.getAnsweredAt() >= q.getIssuedAt()) {
+                            totalAnswerTimeMs += (q.getAnsweredAt() - q.getIssuedAt());
+                            timedAnswersCount++;
+                        }
+                    }
+                }
+            }
+            
+            le.answeredQuestionsCount = answeredCount;
+            le.correctAnswersCount = correctCount;
+            le.accuracyPercent = (answeredCount > 0) ? (int) Math.round(((double) correctCount / answeredCount) * 100) : 0;
+            le.averageAnswerTimeSeconds = (timedAnswersCount > 0) ? (int) Math.round((totalAnswerTimeMs / (double) timedAnswersCount) / 1000.0) : 0;
+            
             res.leaderboard.add(le);
         }
         if (!res.leaderboard.isEmpty()) {

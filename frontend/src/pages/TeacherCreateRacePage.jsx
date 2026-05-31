@@ -39,17 +39,25 @@ const TeacherCreateRacePage = () => {
   };
 
   return (
-    <Layout>
-      <div className="auth-page">
-        <Card className="auth-box">
-          <h2 style={{marginTop: 0}}>יצירת מרוץ חדש</h2>
-          <form onSubmit={handleCreate}>
-            <Input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="כותרת המרוץ" />
-            <Button type="submit" style={{width: '100%'}}>צור מרוץ</Button>
-          </form>
-        </Card>
-      </div>
-    </Layout>
+    <div className="teacher-create-wrapper">
+      <Layout title="Innovative Learning Race">
+        <div className="auth-page">
+          <Card className="auth-box">
+            <h2>יצירת מרוץ חדש</h2>
+            <form onSubmit={handleCreate}>
+              <Input 
+                type="text" 
+                value={title} 
+                onChange={e => setTitle(e.target.value)} 
+                placeholder="כותרת המרוץ" 
+                className="cyber-create-input"
+              />
+              <Button type="submit" className="cyber-create-btn">צור מרוץ</Button>
+            </form>
+          </Card>
+        </div>
+      </Layout>
+    </div>
   );
 };
 

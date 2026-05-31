@@ -83,9 +83,7 @@ const TeacherLobbyPage = () => {
   const participantsCount = lobby.participantsCount || (lobby.participants ? lobby.participants.length : 0);
 
   return (
-    <div className="join-page-container" style={{ direction: 'rtl' }}>
-      <div className="join-page-bg"></div>
-
+    <div className="join-page-container t-lobby-page-container">
       {/* TOP HEADER */}
       <div className="dashboard-header" style={{ position: 'absolute', top: 0, left: 0, right: 0, borderBottom: 'none', background: 'transparent', padding: '0.5rem 2rem' }}>
         <div style={{ width: '50px' }}></div>
@@ -106,8 +104,9 @@ const TeacherLobbyPage = () => {
         <div className="t-lobby-left-panel">
           <div className="t-lobby-title-area">
             <h1 className="t-lobby-main-title">
-              <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--neon-blue)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginLeft: '10px' }}><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+              <span className="t-title-checkers">▞▞▞</span>
               חדר המתנה
+              <span className="t-title-checkers">▞▞▞</span>
             </h1>
             <p className="t-lobby-subtitle">חבר את התלמידים שלך והתחל את המרוץ!</p>
           </div>

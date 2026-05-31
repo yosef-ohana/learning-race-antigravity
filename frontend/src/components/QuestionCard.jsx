@@ -16,10 +16,11 @@ const QuestionCard = ({ question, onSubmitAnswer, onExpire, hasPendingHelpChoice
   };
 
   const hasOptions = question.options && Array.isArray(question.options) && question.options.length > 0;
+  const hasHelpActive = hasPendingHelpChoice && skippedHelpQuestionId !== question.questionId;
 
   return (
     <div className="question-container" style={{ position: 'relative' }}>
-      <div className="question-left-pane">
+      <div className={`question-left-pane ${hasHelpActive ? 'has-help-active' : ''}`}>
         <TimerDisplay expiresAt={question.expiresAt} onExpire={() => onExpire(-1)} />
         
         <div className="hebrew-text" style={{ textAlign: 'center', fontSize: 'clamp(1.2rem, 3.5vh, 1.9rem)', margin: '0.4rem 0', textShadow: '0 0 15px #fff', fontWeight: 'bold' }}>
