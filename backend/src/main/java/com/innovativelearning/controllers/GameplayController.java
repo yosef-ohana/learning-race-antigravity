@@ -19,6 +19,10 @@ import com.innovativelearning.services.DecisionMeterService;
 import com.innovativelearning.services.LuckEventService;
 import com.innovativelearning.services.QuestionGeneratorService;
 import com.innovativelearning.services.ScoringService;
+import com.innovativelearning.services.RaceSnapshotService;
+import com.innovativelearning.services.QuestionResponseMapper;
+import com.innovativelearning.services.QuestionTemplateSelectionService;
+import com.innovativelearning.services.GameplayEligibilityService;
 import com.innovativelearning.utils.GameConstants;
 import com.innovativelearning.utils.SseConnectionManager;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -31,7 +35,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.stream.Collectors;
 
 @RestController
 public class GameplayController {
@@ -42,12 +45,19 @@ public class GameplayController {
     private final BranchingService branchingService;
     private final LuckEventService luckEventService;
     private final QuestionGeneratorService questionGeneratorService;
-    private final Random random = new Random();
+    private final RaceSnapshotService raceSnapshotService;
+    private final QuestionResponseMapper questionResponseMapper;
+    private final QuestionTemplateSelectionService questionTemplateSelectionService;
+    private final GameplayEligibilityService gameplayEligibilityService;
 
     public GameplayController(Persist persist, SseConnectionManager sseManager, 
                               ScoringService scoringService, DecisionMeterService decisionMeterService,
                               BranchingService branchingService, LuckEventService luckEventService,
-                              QuestionGeneratorService questionGeneratorService) {
+                              QuestionGeneratorService questionGeneratorService,
+                              RaceSnapshotService raceSnapshotService,
+                              QuestionResponseMapper questionResponseMapper,
+                              QuestionTemplateSelectionService questionTemplateSelectionService,
+                              GameplayEligibilityService gameplayEligibilityService) {
         this.persist = persist;
         this.sseManager = sseManager;
         this.scoringService = scoringService;
@@ -55,36 +65,14 @@ public class GameplayController {
         this.branchingService = branchingService;
         this.luckEventService = luckEventService;
         this.questionGeneratorService = questionGeneratorService;
+        this.raceSnapshotService = raceSnapshotService;
+        this.questionResponseMapper = questionResponseMapper;
+        this.questionTemplateSelectionService = questionTemplateSelectionService;
+        this.gameplayEligibilityService = gameplayEligibilityService;
     }
 
     private void broadcastRaceUpdate(Long raceId) {
-        RaceEntity race = persist.get(RaceEntity.class, raceId);
-        List<RaceParticipantEntity> allParts = persist.executeQuery("from RaceParticipantEntity where raceId = :rid", Map.of("rid", raceId), RaceParticipantEntity.class);
-        com.innovativelearning.utils.RaceUtils.sortParticipants(allParts);
-        
-        DashboardSnapshotResponse snap = new DashboardSnapshotResponse();
-        snap.raceStatus = race.getStatus();
-        snap.participantsPositions = new ArrayList<>();
-        snap.leaderboard = new ArrayList<>();
-        
-        int rank = 1;
-        for (RaceParticipantEntity p : allParts) {
-            UserEntity u = persist.get(UserEntity.class, p.getUserId());
-            DashboardSnapshotResponse.ParticipantPosition pp = new DashboardSnapshotResponse.ParticipantPosition();
-            pp.id = p.getUserId();
-            pp.displayName = u.getDisplayName();
-            pp.position = p.getPosition() != null ? p.getPosition() : 0;
-            pp.points = p.getPoints() != null ? p.getPoints() : 0;
-            pp.rank = p.getFinishRank() != null ? p.getFinishRank() : rank++;
-            pp.currentState = p.getCurrentState() != null ? p.getCurrentState().name() : ParticipantState.NORMAL.name();
-            pp.activeLuckMultiplier = p.getActiveLuckMultiplier();
-            pp.decisionMeter = p.getDecisionMeter() != null ? p.getDecisionMeter() : 0;
-            pp.freezeUntil = p.getFreezeUntil();
-            
-            snap.participantsPositions.add(pp);
-            snap.leaderboard.add(pp);
-        }
-        
+        DashboardSnapshotResponse snap = raceSnapshotService.buildSnapshot(raceId);
         sseManager.sendEvent(raceId, "participant-progress-updated", snap);
     }
 
@@ -125,7 +113,7 @@ public class GameplayController {
         res.playerState.displayName = student.getDisplayName();
         res.playerState.position = participant.getPosition() != null ? participant.getPosition() : 0;
         res.playerState.points = participant.getPoints() != null ? participant.getPoints() : 0;
-        res.playerState.isBehind = checkIsBehind(raceId, res.playerState.position);
+        res.playerState.isBehind = gameplayEligibilityService.checkIsBehind(raceId, res.playerState.position);
         res.playerState.hasPendingDecision = participant.getCurrentState() == ParticipantState.DECISION_PENDING && !hasActiveQ;
         res.playerState.currentState = participant.getCurrentState() != null ? participant.getCurrentState().name() : ParticipantState.NORMAL.name();
         res.playerState.status = res.playerState.currentState;
@@ -134,7 +122,7 @@ public class GameplayController {
         res.playerState.freezeUntil = participant.getFreezeUntil();
         
         boolean helpAlreadyUsed = activeQ != null && activeQ.getHelpUsed() != null;
-        res.playerState.hasPendingHelpChoice = isHelpEligibleNow(raceId, participant) && !res.playerState.hasPendingDecision && !helpAlreadyUsed;
+        res.playerState.hasPendingHelpChoice = gameplayEligibilityService.isHelpEligibleNow(raceId, participant) && !res.playerState.hasPendingDecision && !helpAlreadyUsed;
         res.playerState.helpAvailable = res.playerState.hasPendingHelpChoice;
         res.playerState.raceFinished = Boolean.TRUE.equals(participant.getFinished());
 
@@ -212,28 +200,14 @@ public class GameplayController {
             return null;
         }
 
-
-        
         if (activeQ == null) {
-            QuestionTemplateEntity tmpl = pickTemplate(participant, existingQs);
+            QuestionTemplateEntity tmpl = questionTemplateSelectionService.pickTemplate(participant, existingQs);
             activeQ = questionGeneratorService.generateQuestion(raceId, participant.getId(), tmpl, existingQs);
             persist.save(activeQ);
         }
 
-        QuestionResponse qr = new QuestionResponse();
-        qr.questionId = activeQ.getId();
-        qr.questionText = activeQ.getQuestionText();
-        setOptionsOnQuestionResponse(qr, activeQ.getOptionsJson());
-        qr.status = activeQ.getStatus();
-        qr.branchType = activeQ.getBranchType();
-        qr.expiresAt = activeQ.getExpiresAt();
-        qr.hintAvailable = checkIsBehind(raceId, participant.getPosition() != null ? participant.getPosition() : 0);
-        if ("HINT".equals(activeQ.getHelpUsed())) {
-            qr.hintText = "נותרו שתי אפשרויות בלבד";
-            applyHintToOptions(qr, activeQ);
-        }
-        qr.helpUsed = activeQ.getHelpUsed();
-        return qr;
+        boolean hintAvailable = gameplayEligibilityService.checkIsBehind(raceId, participant.getPosition() != null ? participant.getPosition() : 0);
+        return questionResponseMapper.buildQuestionResponse(activeQ, hintAvailable);
     }
 
     @PostMapping("/submit-answer")
@@ -381,7 +355,7 @@ public class GameplayController {
                 "from RaceQuestionEntity where participantId = :pid",
                 Map.of("pid", participant.getId()), RaceQuestionEntity.class);
             
-            QuestionTemplateEntity tmpl = pickTemplate(participant, existingQs);
+            QuestionTemplateEntity tmpl = questionTemplateSelectionService.pickTemplate(participant, existingQs);
             activeQ = questionGeneratorService.generateQuestion(raceId, participant.getId(), tmpl, existingQs);
             activeQ.setHelpUsed("POST_REPLACE");
             persist.save(activeQ);
@@ -393,85 +367,7 @@ public class GameplayController {
             return null;
         }
 
-        QuestionResponse qr = new QuestionResponse();
-        qr.questionId = activeQ.getId();
-        qr.questionText = activeQ.getQuestionText();
-        setOptionsOnQuestionResponse(qr, activeQ.getOptionsJson());
-        qr.status = activeQ.getStatus();
-        qr.branchType = activeQ.getBranchType();
-        qr.expiresAt = activeQ.getExpiresAt();
-        if ("HINT".equals(helpType)) {
-            qr.hintText = "נותרו שתי אפשרויות בלבד";
-            applyHintToOptions(qr, activeQ);
-        }
-        qr.helpUsed = activeQ.getHelpUsed();
-        return qr;
-    }
-
-    private QuestionTemplateEntity pickTemplate(RaceParticipantEntity participant, List<RaceQuestionEntity> existingQs) {
-        List<QuestionTemplateEntity> allTemplates = persist.list(QuestionTemplateEntity.class);
-        if (allTemplates.isEmpty()) throw new RuntimeException("No templates");
-        
-        List<QuestionTemplateEntity> active = allTemplates.stream().filter(t -> Boolean.TRUE.equals(t.getIsActive())).collect(Collectors.toList());
-        if (active.isEmpty()) active = allTemplates;
-        
-        String currentBranch = participant.getCurrentState() != null ? participant.getCurrentState().name() : "NORMAL";
-        if (currentBranch.equals("FROZEN") || currentBranch.equals("DECISION_PENDING")) currentBranch = "NORMAL";
-        
-        final String cb = currentBranch;
-        List<QuestionTemplateEntity> branchTmpls = active.stream().filter(t -> cb.equals(t.getBranchCompatibility())).collect(Collectors.toList());
-        if (branchTmpls.isEmpty()) branchTmpls = active;
-
-        // Deterministic template lock by branch: HIGHWAY → WORK_TOGETHER, DIRT_ROAD → EQ_REVERSE_OPS
-        if ("HIGHWAY".equals(cb)) {
-            final List<QuestionTemplateEntity> branchTmplsFinal = branchTmpls;
-            QuestionTemplateEntity locked = branchTmplsFinal.stream()
-                .filter(t -> "WORK_TOGETHER".equals(t.getLogicTag()) && Boolean.TRUE.equals(t.getIsActive()))
-                .findFirst().orElse(null);
-            if (locked != null) return locked;
-        } else if ("DIRT_ROAD".equals(cb)) {
-            final List<QuestionTemplateEntity> branchTmplsFinal = branchTmpls;
-            QuestionTemplateEntity locked = branchTmplsFinal.stream()
-                .filter(t -> "EQ_REVERSE_OPS".equals(t.getLogicTag()) && Boolean.TRUE.equals(t.getIsActive()))
-                .findFirst().orElse(null);
-            if (locked != null) return locked;
-        }
-
-        if (existingQs == null || existingQs.isEmpty()) {
-            return branchTmpls.get(random.nextInt(branchTmpls.size()));
-        }
-
-        List<RaceQuestionEntity> recent = existingQs.stream()
-            .filter(q -> q.getAnsweredAt() != null)
-            .sorted((a,b) -> Long.compare(b.getAnsweredAt(), a.getAnsweredAt()))
-            .collect(Collectors.toList());
-
-        List<Long> recentTemplateIds = recent.stream().limit(5).map(RaceQuestionEntity::getTemplateId).collect(Collectors.toList());
-        
-        String fam1 = null; String fam2 = null;
-        if (recent.size() >= 1) fam1 = getTemplateFamilyById(allTemplates, recent.get(0).getTemplateId());
-        if (recent.size() >= 2) fam2 = getTemplateFamilyById(allTemplates, recent.get(1).getTemplateId());
-        
-        String bannedFamily = null;
-        if (fam1 != null && fam1.equals(fam2)) bannedFamily = fam1;
-        final String finalBannedFamily = bannedFamily;
-        
-        List<QuestionTemplateEntity> candidates = branchTmpls.stream()
-            .filter(t -> !recentTemplateIds.contains(t.getId()))
-            .filter(t -> finalBannedFamily == null || !finalBannedFamily.equals(t.getTemplateFamily()))
-            .collect(Collectors.toList());
-            
-        if (candidates.isEmpty()) {
-            candidates = branchTmpls;
-        }
-        
-        return candidates.get(random.nextInt(candidates.size()));
-    }
-
-    private String getTemplateFamilyById(List<QuestionTemplateEntity> list, Long id) {
-        if (id == null) return null;
-        QuestionTemplateEntity tmpl = list.stream().filter(t -> id.equals(t.getId())).findFirst().orElse(null);
-        return tmpl != null ? tmpl.getTemplateFamily() : null;
+        return questionResponseMapper.buildQuestionResponse(activeQ, false);
     }
 
     private UserEntity getStudentByToken(String token) {
@@ -483,76 +379,5 @@ public class GameplayController {
     private RaceParticipantEntity getParticipant(Long raceId, Long userId) {
         return persist.executeQuerySingle("from RaceParticipantEntity where raceId = :rid and userId = :uid", 
             Map.of("rid", raceId, "uid", userId), RaceParticipantEntity.class);
-    }
-
-    private boolean checkIsBehind(Long raceId, int myPosition) {
-        List<RaceParticipantEntity> parts = persist.executeQuery(
-            "from RaceParticipantEntity where raceId = :rid", 
-            Map.of("rid", raceId), RaceParticipantEntity.class);
-        if (parts.size() < 2) return false;
-        
-        com.innovativelearning.utils.RaceUtils.sortParticipants(parts);
-        int leaderPos = parts.get(0).getPosition() != null ? parts.get(0).getPosition() : 0;
-        return (leaderPos - myPosition) >= GameConstants.BEHIND_DISTANCE_THRESHOLD;
-    }
-
-    private boolean isHelpEligibleNow(Long raceId, RaceParticipantEntity participant) {
-        int wrongCount = participant.getConsecutiveWrongCount() != null ? participant.getConsecutiveWrongCount() : 0;
-        int noProgress = participant.getConsecutiveNoProgressCount() != null ? participant.getConsecutiveNoProgressCount() : 0;
-        if (wrongCount < 3 && noProgress < 3) return false;
-
-        List<RaceParticipantEntity> parts = persist.executeQuery(
-            "from RaceParticipantEntity where raceId = :rid", 
-            Map.of("rid", raceId), RaceParticipantEntity.class);
-        if (parts.size() < 2) return false;
-        
-        com.innovativelearning.utils.RaceUtils.sortParticipants(parts);
-        RaceParticipantEntity leader = parts.get(0);
-        if (leader.getId().equals(participant.getId())) return false;
-        
-        int posDiff = leader.getPosition() - (participant.getPosition() == null ? 0 : participant.getPosition());
-        int ptsDiff = leader.getPoints() - (participant.getPoints() == null ? 0 : participant.getPoints());
-        
-        return posDiff >= GameConstants.BEHIND_DISTANCE_THRESHOLD || ptsDiff >= GameConstants.BEHIND_POINTS_THRESHOLD;
-    }
-
-    private void applyHintToOptions(QuestionResponse qr, RaceQuestionEntity activeQ) {
-        if (qr.options == null || qr.options.size() <= 2) return;
-        Integer correctId = activeQ.getCorrectOptionId();
-        if (correctId == null) return;
-
-        List<QuestionResponse.Option> wrongOptions = new ArrayList<>();
-        QuestionResponse.Option correctOption = null;
-
-        for (QuestionResponse.Option opt : qr.options) {
-            if (opt.id == correctId) {
-                correctOption = opt;
-            } else {
-                wrongOptions.add(opt);
-            }
-        }
-
-        if (correctOption != null && !wrongOptions.isEmpty()) {
-            int index = (int) (activeQ.getId() % wrongOptions.size());
-            QuestionResponse.Option selectedWrongOption = wrongOptions.get(index);
-            
-            List<QuestionResponse.Option> newOptions = new ArrayList<>();
-            for (QuestionResponse.Option opt : qr.options) {
-                if (opt.id == correctOption.id || opt.id == selectedWrongOption.id) {
-                    newOptions.add(opt);
-                }
-            }
-            qr.options = newOptions;
-        }
-    }
-
-    private void setOptionsOnQuestionResponse(QuestionResponse qr, String optionsJson) {
-        if (optionsJson == null) return;
-        try {
-            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-            qr.options = mapper.readValue(optionsJson, new com.fasterxml.jackson.core.type.TypeReference<java.util.List<QuestionResponse.Option>>() {});
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

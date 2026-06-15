@@ -1,0 +1,15 @@
+/* Responsive grid fallback for smaller screens */
+@media (max-width: 1200px) {
+  .teacher-roster {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 900px) {
+  .t-lobby-content {
+    flex-direction: column;
+  }
+  .teacher-roster {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

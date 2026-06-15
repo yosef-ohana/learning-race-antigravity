@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
-import RaceTrack from '../components/RaceTrack';
-import PathChoiceModal from '../components/PathChoiceModal';
-import QuestionCard from '../components/QuestionCard';
 import Cookies from 'js-cookie';
 import { COOKIE_STUDENT_TOKEN } from '../config/cookieNames';
 import { fetchStudentRaceState, fetchCurrentQuestion, submitAnswer, choosePath, useHelp } from '../services/api';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ROUTES } from '../config/routePaths';
 import { createSSEConnection } from '../services/sse';
+import StudentRaceHud from '../components/StudentRaceHud';
+import StudentRaceOverlays from '../components/StudentRaceOverlays';
+import StudentRaceMainStage from '../components/StudentRaceMainStage';
 
 const StudentRacePage = () => {
   const { raceId } = useParams();
@@ -136,7 +136,7 @@ const StudentRacePage = () => {
           setLuckPopup(null);
         }, 2000);
       } else if (activeLuckMultiplier < 1 && prevMultiplierRef.current === 1) {
-        setLuckPopup({ type: 'PUNCTURE', text: '⚠️ פנצ\'ר! התשובה הנכונה הבאה תעניק חצי מהנקודות' });
+        setLuckPopup({ type: 'PUNCTURE', text: "⚠️ פנצ'ר! התשובה הנכונה הבאה תעניק חצי מהנקודות" });
         luckTimeoutRef.current = setTimeout(() => {
           setLuckPopup(null);
         }, 2000);
@@ -224,119 +224,31 @@ const StudentRacePage = () => {
 
   return (
     <div className="student-layout">
-      {sseError && (
-        <div className="overlay-blur hebrew-text" style={{ zIndex: 9999, color: 'var(--danger)', borderColor: 'var(--danger)', boxShadow: 'inset 0 0 50px rgba(255,0,0,0.2)' }}>
-          <h2 style={{ fontSize: '3rem' }}>החיבור נותק</h2>
-          <p>מנסה להתחבר מחדש...</p>
-        </div>
-      )}
+      <StudentRaceOverlays
+        sseError={sseError}
+        isFrozen={state.playerState.status === 'FROZEN'}
+        frozenTimeRemaining={frozenTimeRemaining}
+        event={event}
+        luckPopup={luckPopup}
+      />
 
-      <div className="student-top" style={{ padding: '0.3rem 0.6rem 0.3rem' }}>
-        
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.4rem', padding: '0 0.4rem' }}>
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-            <div className="live-indicator hebrew-text" style={{ fontSize: '0.85rem' }}>שידור חי</div>
-            <div className="glow-card hebrew-text" style={{ padding: '0.3rem 0.8rem', fontSize: '0.85rem', border: '1px solid var(--neon-purple)', color: '#fff' }}>
-              🏆 מיקום {state.playerState.rank}/{state.participantsPositions.length}
-            </div>
-          </div>
-          
-          <div className="glow-card hebrew-text" style={{ padding: '0.3rem 1rem', color: 'var(--neon-blue)', borderColor: 'var(--neon-blue)', fontSize: '1rem', display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
-            <div>
-              <span style={{ fontSize: '1.2rem', fontWeight: 'bold' }}>{state.playerState.points}</span> נק'
-            </div>
-            {activeLuckMultiplier > 1 && (
-              <div style={{ padding: '0.1rem 0.4rem', background: 'rgba(0, 255, 0, 0.1)', border: '1px solid var(--neon-green)', borderRadius: '4px', color: 'var(--neon-green)', fontSize: '0.85rem', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-green)', whiteSpace: 'nowrap' }} className="hebrew-text">
-                ⚡ בוסט <span className="bidi-isolate">x1.5</span>
-              </div>
-            )}
-            {activeLuckMultiplier < 1 && (
-              <div style={{ padding: '0.1rem 0.4rem', background: 'rgba(255, 0, 0, 0.1)', border: '1px solid var(--danger)', borderRadius: '4px', color: 'var(--danger)', fontSize: '0.85rem', fontWeight: 'bold', textShadow: '0 0 5px var(--danger)', whiteSpace: 'nowrap' }} className="hebrew-text">
-                ⚠️ פנצ'ר <span className="bidi-isolate">x0.5</span>
-              </div>
-            )}
-          </div>
-          
-          <div style={{ display: 'flex', flexDirection: 'column', width: '200px' }} className="hebrew-text">
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '3px', fontSize: '0.8rem', color: 'var(--neon-purple)', fontWeight: 'bold', textShadow: '0 0 5px var(--neon-purple)' }}>
-              <span>מד החלטה</span>
-              <span className="bidi-isolate">{state.playerState.decisionMeter || 0}%</span>
-            </div>
-            <div className="decision-meter" style={{ width: '100%', height: '6px', borderRadius: '3px', overflow: 'hidden', border: '1px solid var(--neon-purple)' }}>
-              <div className="decision-fill" style={{ width: `${state.playerState.decisionMeter || 0}%`, height: '100%', background: 'var(--neon-purple)', boxShadow: '0 0 10px var(--neon-purple)' }}></div>
-            </div>
-          </div>
-        </div>
-        
-        <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column', justifyContent: 'center', overflow: 'hidden' }}>
-          <RaceTrack participantsPositions={state.participantsPositions} currentUserId={state.playerState.id} />
-        </div>
-      </div>
+      <StudentRaceHud
+        playerState={state.playerState}
+        participantsPositions={state.participantsPositions}
+        activeLuckMultiplier={activeLuckMultiplier}
+      />
 
       <div className="student-bottom">
-        {state.playerState.status === 'FROZEN' && (
-          <div className="student-feedback-overlay hebrew-text">
-            <div className="student-feedback-card frozen">
-              <div style={{ fontSize: '3rem', animation: 'pulse 1.5s infinite' }}>🧊</div>
-              <h1 style={{ fontSize: '2.2rem', margin: '0.5rem 0', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)' }}>קפוא!</h1>
-              <h2 style={{ fontSize: '1.4rem', margin: 0 }}>מערכת נעולה: <span className="bidi-isolate" style={{ color: 'var(--neon-blue)', fontWeight: 'bold' }}>{frozenTimeRemaining}</span> שניות</h2>
-            </div>
-          </div>
-        )}
-
-        {event && (
-          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
-            <div className={`student-feedback-card ${
-              event.includes('נכונה') || event.includes('רמז') || event.includes('הוחלפה') ? 'success' : 'error'
-            }`} style={{ pointerEvents: 'none' }}>
-              <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>
-                {event.includes('נכונה') ? '🎉' : 
-                 event.includes('רמז') ? '💡' : 
-                 event.includes('הוחלפה') ? '🔄' : 
-                 event.includes('זמן') ? '⏰' : '💥'}
-              </div>
-              <h1 style={{ fontSize: '2.2rem', margin: 0 }}>{event}</h1>
-            </div>
-          </div>
-        )}
-
-        {luckPopup && (
-          <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 100, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
-            <div className={`student-feedback-card luck ${luckPopup.type === 'BOOST' ? 'boost' : 'puncture'}`} style={{ pointerEvents: 'none' }}>
-              <h1 style={{ 
-                fontSize: '1.6rem', 
-                color: luckPopup.type === 'BOOST' ? 'var(--neon-green)' : 'var(--danger)',
-                textShadow: luckPopup.type === 'BOOST' ? '0 0 15px var(--neon-green)' : '0 0 15px var(--danger)',
-                margin: 0,
-                lineHeight: '1.4'
-              }}>
-                {luckPopup.text}
-              </h1>
-            </div>
-          </div>
-        )}
-
-        {state.playerState.hasPendingDecision ? (
-          <PathChoiceModal isOpen={true} onChoice={handlePathChoice} />
-        ) : question ? (
-          isAnswering ? (
-            <div className="overlay-blur hebrew-text">
-              <h2 style={{ fontSize: '2rem' }}>מעלה תשובה...</h2>
-            </div>
-          ) : (
-            <QuestionCard 
-              question={question} 
-              onSubmitAnswer={handleSubmitAnswer} 
-              onExpire={() => handleSubmitAnswer('')} 
-              hasPendingHelpChoice={state.playerState.hasPendingHelpChoice}
-              onHelpChoice={handleHelpChoice}
-            />
-          )
-        ) : (
-          <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', color: 'var(--neon-blue)', textShadow: '0 0 10px var(--neon-blue)' }} className="hebrew-text">
-            ממתין לשלב הבא...
-          </div>
-        )}
+        <StudentRaceMainStage
+          hasPendingDecision={state.playerState.hasPendingDecision}
+          question={question}
+          isAnswering={isAnswering}
+          hasPendingHelpChoice={state.playerState.hasPendingHelpChoice}
+          onPathChoice={handlePathChoice}
+          onSubmitAnswer={handleSubmitAnswer}
+          onExpire={() => handleSubmitAnswer('')}
+          onHelpChoice={handleHelpChoice}
+        />
       </div>
     </div>
   );
