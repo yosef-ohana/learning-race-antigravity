@@ -19,6 +19,14 @@ A real-time, interactive, gamified math racing game. Students answer math questi
 
 ---
 
+## 📚 Code Navigation Guide
+
+For reviewers or future developers who want to understand where each part of the code lives and how to safely add features, see:
+
+[`docs/CODE_GUIDE.md`](docs/CODE_GUIDE.md)
+
+---
+
 ## 🚀 Run Instructions
 
 ### 1. Backend Service
