@@ -229,7 +229,8 @@ public class GameplayController {
         qr.expiresAt = activeQ.getExpiresAt();
         qr.hintAvailable = checkIsBehind(raceId, participant.getPosition() != null ? participant.getPosition() : 0);
         if ("HINT".equals(activeQ.getHelpUsed())) {
-            qr.hintText = "קרא את השאלה לאט, סמן את הנתונים החשובים ובדוק איזו פעולה מתמטית נדרשת."; // basic hint
+            qr.hintText = "נותרו שתי אפשרויות בלבד";
+            applyHintToOptions(qr, activeQ);
         }
         qr.helpUsed = activeQ.getHelpUsed();
         return qr;
@@ -400,7 +401,8 @@ public class GameplayController {
         qr.branchType = activeQ.getBranchType();
         qr.expiresAt = activeQ.getExpiresAt();
         if ("HINT".equals(helpType)) {
-            qr.hintText = "קרא את השאלה לאט, סמן את הנתונים החשובים ובדוק איזו פעולה מתמטית נדרשת.";
+            qr.hintText = "נותרו שתי אפשרויות בלבד";
+            applyHintToOptions(qr, activeQ);
         }
         qr.helpUsed = activeQ.getHelpUsed();
         return qr;
@@ -512,6 +514,36 @@ public class GameplayController {
         int ptsDiff = leader.getPoints() - (participant.getPoints() == null ? 0 : participant.getPoints());
         
         return posDiff >= GameConstants.BEHIND_DISTANCE_THRESHOLD || ptsDiff >= GameConstants.BEHIND_POINTS_THRESHOLD;
+    }
+
+    private void applyHintToOptions(QuestionResponse qr, RaceQuestionEntity activeQ) {
+        if (qr.options == null || qr.options.size() <= 2) return;
+        Integer correctId = activeQ.getCorrectOptionId();
+        if (correctId == null) return;
+
+        List<QuestionResponse.Option> wrongOptions = new ArrayList<>();
+        QuestionResponse.Option correctOption = null;
+
+        for (QuestionResponse.Option opt : qr.options) {
+            if (opt.id == correctId) {
+                correctOption = opt;
+            } else {
+                wrongOptions.add(opt);
+            }
+        }
+
+        if (correctOption != null && !wrongOptions.isEmpty()) {
+            int index = (int) (activeQ.getId() % wrongOptions.size());
+            QuestionResponse.Option selectedWrongOption = wrongOptions.get(index);
+            
+            List<QuestionResponse.Option> newOptions = new ArrayList<>();
+            for (QuestionResponse.Option opt : qr.options) {
+                if (opt.id == correctOption.id || opt.id == selectedWrongOption.id) {
+                    newOptions.add(opt);
+                }
+            }
+            qr.options = newOptions;
+        }
     }
 
     private void setOptionsOnQuestionResponse(QuestionResponse qr, String optionsJson) {

@@ -163,8 +163,28 @@ const StudentRacePage = () => {
 
   const handleHelpChoice = async (choice) => {
     try {
-      await useHelp(raceId, choice);
-      fetchStateAndQuestion();
+      const currentSeq = ++fetchSequenceRef.current;
+      const res = await useHelp(raceId, choice);
+      if (currentSeq !== fetchSequenceRef.current) return;
+
+      if (res && res.data) {
+        setQuestion(res.data);
+        
+        if (choice === 'HINT') {
+          setEvent('רמז הופעל');
+        } else if (choice === 'REPLACE') {
+          setEvent('השאלה הוחלפה');
+        }
+        
+        if (eventTimeoutRef.current) clearTimeout(eventTimeoutRef.current);
+        eventTimeoutRef.current = setTimeout(() => {
+          setEvent(null);
+        }, 2000);
+
+        const stateRes = await fetchStudentRaceState(raceId);
+        if (currentSeq !== fetchSequenceRef.current) return;
+        setState(stateRes.data);
+      }
     } catch (e) {
       console.error(e);
     }
@@ -266,9 +286,14 @@ const StudentRacePage = () => {
 
         {event && (
           <div className="student-feedback-overlay hebrew-text" style={{ zIndex: 90, pointerEvents: 'none', background: 'transparent', backdropFilter: 'none' }}>
-            <div className={`student-feedback-card ${event.includes('נכונה') ? 'success' : 'error'}`} style={{ pointerEvents: 'none' }}>
+            <div className={`student-feedback-card ${
+              event.includes('נכונה') || event.includes('רמז') || event.includes('הוחלפה') ? 'success' : 'error'
+            }`} style={{ pointerEvents: 'none' }}>
               <div style={{ fontSize: '3.5rem', marginBottom: '0.5rem' }}>
-                {event.includes('נכונה') ? '🎉' : event.includes('זמן') ? '⏰' : '💥'}
+                {event.includes('נכונה') ? '🎉' : 
+                 event.includes('רמז') ? '💡' : 
+                 event.includes('הוחלפה') ? '🔄' : 
+                 event.includes('זמן') ? '⏰' : '💥'}
               </div>
               <h1 style={{ fontSize: '2.2rem', margin: 0 }}>{event}</h1>
             </div>
