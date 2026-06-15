@@ -419,7 +419,22 @@ public class GameplayController {
         final String cb = currentBranch;
         List<QuestionTemplateEntity> branchTmpls = active.stream().filter(t -> cb.equals(t.getBranchCompatibility())).collect(Collectors.toList());
         if (branchTmpls.isEmpty()) branchTmpls = active;
-        
+
+        // Deterministic template lock by branch: HIGHWAY → WORK_TOGETHER, DIRT_ROAD → EQ_REVERSE_OPS
+        if ("HIGHWAY".equals(cb)) {
+            final List<QuestionTemplateEntity> branchTmplsFinal = branchTmpls;
+            QuestionTemplateEntity locked = branchTmplsFinal.stream()
+                .filter(t -> "WORK_TOGETHER".equals(t.getLogicTag()) && Boolean.TRUE.equals(t.getIsActive()))
+                .findFirst().orElse(null);
+            if (locked != null) return locked;
+        } else if ("DIRT_ROAD".equals(cb)) {
+            final List<QuestionTemplateEntity> branchTmplsFinal = branchTmpls;
+            QuestionTemplateEntity locked = branchTmplsFinal.stream()
+                .filter(t -> "EQ_REVERSE_OPS".equals(t.getLogicTag()) && Boolean.TRUE.equals(t.getIsActive()))
+                .findFirst().orElse(null);
+            if (locked != null) return locked;
+        }
+
         if (existingQs == null || existingQs.isEmpty()) {
             return branchTmpls.get(random.nextInt(branchTmpls.size()));
         }
