@@ -2,6 +2,13 @@
 
 A short guide for reviewers and future developers who want to understand where each part of the project lives and how to safely add features.
 
+## Quick Info
+
+* Runtime and setup instructions live in the root `README.md`.
+* Backend: 8080.
+* Frontend: 3000.
+* Use the Maven Wrapper; global Maven is not required.
+
 ## Core Principle
 
 The backend is the source of truth for game rules.
